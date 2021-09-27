@@ -2,8 +2,6 @@ package edu.byu.cs.tweeter.client.view.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,34 +11,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-import java.net.MalformedURLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import edu.byu.cs.client.R;
-import edu.byu.cs.tweeter.client.backgroundTask.IsFollowerTask;
-import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.presenter.FollowCountPresenter;
 import edu.byu.cs.tweeter.client.presenter.FollowPresenter;
 import edu.byu.cs.tweeter.client.presenter.LogoutPresenter;
+import edu.byu.cs.tweeter.client.presenter.MainPresenter;
 import edu.byu.cs.tweeter.client.presenter.PostPresenter;
 import edu.byu.cs.tweeter.client.view.login.LoginActivity;
 import edu.byu.cs.tweeter.client.view.login.StatusDialogFragment;
 import edu.byu.cs.tweeter.client.view.util.ImageUtils;
-import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
 /**
@@ -48,10 +33,7 @@ import edu.byu.cs.tweeter.model.domain.User;
  */
 public class MainActivity extends AppCompatActivity implements
         StatusDialogFragment.Observer,
-        FollowPresenter.View,
-        LogoutPresenter.View,
-        PostPresenter.View,
-        FollowCountPresenter.View
+        MainPresenter.View
 {
 
     private static final String LOG_TAG = "MainActivity";
@@ -64,10 +46,12 @@ public class MainActivity extends AppCompatActivity implements
     private TextView followerCount;
     private Button followButton;
 
-    private FollowPresenter followPresenter;
-    private LogoutPresenter logoutPresenter;
-    private PostPresenter postPresenter;
-    private FollowCountPresenter countPresenter;
+    private MainPresenter presenter;
+
+//    private FollowPresenter followPresenter;
+//    private LogoutPresenter logoutPresenter;
+//    private PostPresenter postPresenter;
+//    private FollowCountPresenter countPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +63,12 @@ public class MainActivity extends AppCompatActivity implements
             throw new RuntimeException("User not passed to activity");
         }
 
-        followPresenter = new FollowPresenter(this, Cache.getInstance().getCurrUserAuthToken(), selectedUser);
-        logoutPresenter = new LogoutPresenter(this, Cache.getInstance().getCurrUserAuthToken());
-        postPresenter = new PostPresenter(this,Cache.getInstance().getCurrUserAuthToken());
-        countPresenter = new FollowCountPresenter(this, Cache.getInstance().getCurrUserAuthToken(), selectedUser);
+//        followPresenter = new FollowPresenter(this, Cache.getInstance().getCurrUserAuthToken(), selectedUser);
+//        logoutPresenter = new LogoutPresenter(this, Cache.getInstance().getCurrUserAuthToken());
+//        postPresenter = new PostPresenter(this,Cache.getInstance().getCurrUserAuthToken());
+//        countPresenter = new FollowCountPresenter(this, Cache.getInstance().getCurrUserAuthToken(), selectedUser);
+
+        presenter = new MainPresenter(this,selectedUser);
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedUser);
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -101,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        countPresenter.updateFollowCount();
+        presenter.updateFollowCount();
 
         TextView userName = findViewById(R.id.userName);
         userName.setText(selectedUser.getName());
@@ -120,12 +106,16 @@ public class MainActivity extends AppCompatActivity implements
 
         followButton = findViewById(R.id.followButton);
 
-        followPresenter.isFollower(Cache.getInstance().getCurrUser());
+        //countPresenter.updateFollowCount();
+
+        presenter.isFollower();
+        //followPresenter.isFollower(Cache.getInstance().getCurrUser());
 
         followButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                followPresenter.updateFollow(followButton.getText().toString());
+                presenter.updateFollow(followButton.getText().toString());
+                //followPresenter.updateFollow(followButton.getText().toString());
             }
         });
     }
@@ -140,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.logoutMenu) {
-            logoutPresenter.logout();
+            presenter.logout();
+            //logoutPresenter.logout();
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -149,13 +140,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onStatusPosted(String post) {
-        try{
-            Status newStatus = new Status(post, Cache.getInstance().getCurrUser(), getFormattedDateTime(), parseURLs(post), parseMentions(post));
-            postPresenter.postStatus(newStatus);
-        }
-        catch (Exception ex) {
-            Toast.makeText(this, "Exception caught when parsing DateTime", Toast.LENGTH_LONG).show();
-        }
+        presenter.postStatus(post);
+//        try{
+//            postPresenter.postStatus(post);
+//        }
+//        catch (Exception ex) {
+//            Toast.makeText(this, "Exception caught when parsing DateTime", Toast.LENGTH_LONG).show();
+//        }
     }
 
     @Override
@@ -188,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         // Move to presenter
         //Clear user data (cached data).
-        Cache.getInstance().clearCache();
+        // Cache.getInstance().clearCache();
         startActivity(intent);
     }
 
@@ -228,66 +219,66 @@ public class MainActivity extends AppCompatActivity implements
         followButton.setVisibility(View.GONE);
     }
 
-    public String getFormattedDateTime() throws ParseException {
-        SimpleDateFormat userFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        SimpleDateFormat statusFormat = new SimpleDateFormat("MMM d yyyy h:mm aaa");
-
-        return statusFormat.format(userFormat.parse(LocalDate.now().toString() + " " + LocalTime.now().toString().substring(0, 8)));
-    }
-
-    public List<String> parseURLs(String post) throws MalformedURLException {
-        List<String> containedUrls = new ArrayList<>();
-        for (String word : post.split("\\s")) {
-            if (word.startsWith("http://") || word.startsWith("https://")) {
-
-                int index = findUrlEndIndex(word);
-
-                word = word.substring(0, index);
-
-                containedUrls.add(word);
-            }
-        }
-        return containedUrls;
-    }
-
-    public List<String> parseMentions(String post) {
-        List<String> containedMentions = new ArrayList<>();
-
-        for (String word : post.split("\\s")) {
-            if (word.startsWith("@")) {
-                word = word.replaceAll("[^a-zA-Z0-9]", "");
-                word = "@".concat(word);
-
-                containedMentions.add(word);
-            }
-        }
-
-        return containedMentions;
-    }
-
-    public int findUrlEndIndex(String word) {
-        if (word.contains(".com")) {
-            int index = word.indexOf(".com");
-            index += 4;
-            return index;
-        } else if (word.contains(".org")) {
-            int index = word.indexOf(".org");
-            index += 4;
-            return index;
-        } else if (word.contains(".edu")) {
-            int index = word.indexOf(".edu");
-            index += 4;
-            return index;
-        } else if (word.contains(".net")) {
-            int index = word.indexOf(".net");
-            index += 4;
-            return index;
-        } else if (word.contains(".mil")) {
-            int index = word.indexOf(".mil");
-            index += 4;
-            return index;
-        } else {
-            return word.length();
-        }
-    }
+//    public String getFormattedDateTime() throws ParseException {
+//        SimpleDateFormat userFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+//        SimpleDateFormat statusFormat = new SimpleDateFormat("MMM d yyyy h:mm aaa");
+//
+//        return statusFormat.format(userFormat.parse(LocalDate.now().toString() + " " + LocalTime.now().toString().substring(0, 8)));
+//    }
+//
+//    public List<String> parseURLs(String post) throws MalformedURLException {
+//        List<String> containedUrls = new ArrayList<>();
+//        for (String word : post.split("\\s")) {
+//            if (word.startsWith("http://") || word.startsWith("https://")) {
+//
+//                int index = findUrlEndIndex(word);
+//
+//                word = word.substring(0, index);
+//
+//                containedUrls.add(word);
+//            }
+//        }
+//        return containedUrls;
+//    }
+//
+//    public List<String> parseMentions(String post) {
+//        List<String> containedMentions = new ArrayList<>();
+//
+//        for (String word : post.split("\\s")) {
+//            if (word.startsWith("@")) {
+//                word = word.replaceAll("[^a-zA-Z0-9]", "");
+//                word = "@".concat(word);
+//
+//                containedMentions.add(word);
+//            }
+//        }
+//
+//        return containedMentions;
+//    }
+//
+//    public int findUrlEndIndex(String word) {
+//        if (word.contains(".com")) {
+//            int index = word.indexOf(".com");
+//            index += 4;
+//            return index;
+//        } else if (word.contains(".org")) {
+//            int index = word.indexOf(".org");
+//            index += 4;
+//            return index;
+//        } else if (word.contains(".edu")) {
+//            int index = word.indexOf(".edu");
+//            index += 4;
+//            return index;
+//        } else if (word.contains(".net")) {
+//            int index = word.indexOf(".net");
+//            index += 4;
+//            return index;
+//        } else if (word.contains(".mil")) {
+//            int index = word.indexOf(".mil");
+//            index += 4;
+//            return index;
+//        } else {
+//            return word.length();
+//        }
+//    }
 }

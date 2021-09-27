@@ -1,7 +1,5 @@
 package edu.byu.cs.tweeter.client.presenter;
 
-import android.view.View;
-
 import edu.byu.cs.client.R;
 import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.model.service.FollowService;
@@ -14,8 +12,8 @@ public class FollowPresenter implements FollowService.FollowObserver, FollowServ
         void enableFollowButton(boolean enabled);
         void setFollowVisible();
         void setFollowGone();
-        void displayErrorMessage(String message);
         void displayInfoMessage(String message);
+        void displayErrorMessage(String message);
     }
 
     private View view;
