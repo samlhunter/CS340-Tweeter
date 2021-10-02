@@ -63,10 +63,10 @@ public class followingPresenter implements FollowService.GetFollowingObserver {
         public void getUserSucceeded(User user) { view.navigateToUser(user); }
 
         @Override
-        public void getUserFailed(String message) { view.displayErrorMessage(message);}
+        public void failed(String message) { view.displayErrorMessage(message);}
 
         @Override
-        public void getUserThrewException(Exception ex) { view.displayErrorMessage("Failed to get user's profile because of exception" + ex.getMessage());}
+        public void exceptionThrown(Exception ex) { view.displayErrorMessage("Failed to get user's profile because of exception" + ex.getMessage());}
     }
 
     public void gotoUser(String alias) {

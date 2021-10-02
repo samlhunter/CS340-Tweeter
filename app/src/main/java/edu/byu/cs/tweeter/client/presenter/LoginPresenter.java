@@ -52,12 +52,12 @@ public class LoginPresenter implements UserService.LoginObserver {
     }
 
     @Override
-    public void loginFailed(String message) {
+    public void failed(String message) {
         view.displayErrorMessage("Login failed: " + message);
     }
 
     @Override
-    public void loginThrewException(Exception ex) {
+    public void exceptionThrown(Exception ex) {
         view.displayErrorMessage("Login threw exception: " + ex.getMessage());
     }
 }

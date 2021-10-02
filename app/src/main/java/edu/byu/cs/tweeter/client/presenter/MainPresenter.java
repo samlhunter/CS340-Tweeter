@@ -51,9 +51,7 @@ public class MainPresenter implements
     }
 
     // Logic for Follow Count
-    public void updateFollowCount() {
-        new FollowService().getCounts(authToken, selectedUser, this, this);
-    }
+    public void updateFollowCount() {new FollowService().getCounts(authToken, selectedUser, this, this); }
 
     @Override
     public void getFollowingCountSucceeded(int count) {
@@ -61,29 +59,10 @@ public class MainPresenter implements
     }
 
     @Override
-    public void getFollowingCountFailed(String message) {
-        view.displayErrorMessage("There was an error getting the following count: " + message);
-    }
-
-    @Override
-    public void getFollowingCountThrewException(Exception ex) {
-        view.displayErrorMessage("There was an exception in getting the following count: " + ex.getMessage());
-    }
-
-    @Override
     public void getFollowersCountSucceeded(int count) {
         view.updateFollowersCount(count);
     }
 
-    @Override
-    public void getFollowersCountFailed(String message) {
-        view.displayErrorMessage("There was an error getting the followers count: " + message);
-    }
-
-    @Override
-    public void getFollowersCountThrewException(Exception ex) {
-        view.displayErrorMessage("There was an exception in getting the followers count: " + ex.getMessage());
-    }
 
     // Logic for handling Follow Action
     public void updateFollow(String buttonText) {
@@ -99,9 +78,7 @@ public class MainPresenter implements
     }
 
     public void isFollower() {
-        if (selectedUser.compareTo(Cache.getInstance().getCurrUser()) == 0) {
-            view.setFollowGone();
-        }
+        if (selectedUser.compareTo(Cache.getInstance().getCurrUser()) == 0) { view.setFollowGone(); }
         else {
             view.setFollowVisible();
             new FollowService().isFollower(authToken, Cache.getInstance().getCurrUser(), selectedUser, this);
@@ -114,10 +91,10 @@ public class MainPresenter implements
         view.updateFollowButton("Following", R.color.white,R.color.lightGray);
     }
     @Override
-    public void followFailed(String message) { view.displayErrorMessage("Follow user failed: " + message); }
+    public void failed(String message) { view.displayErrorMessage("Follow user failed: " + message); }
 
     @Override
-    public void followThrewException(Exception ex) { view.displayErrorMessage("Follow user threw exception: " + ex.getMessage()); }
+    public void exceptionThrown(Exception ex) { view.displayErrorMessage("Follow user threw exception: " + ex.getMessage()); }
 
     @Override
     public void unfollowSucceeded() {
@@ -126,24 +103,8 @@ public class MainPresenter implements
     }
 
     @Override
-    public void unfollowFailed(String message) { view.displayErrorMessage("Unfollow user failed: " + message); }
-
-    @Override
-    public void unfollowThrewException(Exception ex) { view.displayErrorMessage("Unfollow user threw exception: " + ex.getMessage()); }
-
-    @Override
     public void isFollowSucceeded(String text, int backgroundColor, int textColor) {
         view.updateFollowButton(text, backgroundColor, textColor);
-    }
-
-    @Override
-    public void isFollowFailed(String message) {
-        view.displayErrorMessage("IsFollower check failed: " + message);
-    }
-
-    @Override
-    public void isFollowThrewException(Exception ex) {
-        view.displayErrorMessage("IsFollower check threw an exception: " + ex.getMessage());
     }
 
     // Logout logic
@@ -158,16 +119,6 @@ public class MainPresenter implements
         view.clearErrorMessage();
         Cache.getInstance().clearCache();
         view.navigateToMenu();
-    }
-
-    @Override
-    public void logoutFailed(String message) {
-        view.displayErrorMessage("Logout failed: " + message);
-    }
-
-    @Override
-    public void logoutThrewException(Exception ex) {
-        view.displayErrorMessage("Logout threw exception: " + ex.getMessage());
     }
 
     // Post Status Logic
@@ -185,16 +136,6 @@ public class MainPresenter implements
     @Override
     public void postStatusSucceeded() {
         view.displayInfoMessage("Status successfully posted");
-    }
-
-    @Override
-    public void postStatusFailed(String message) {
-        view.displayErrorMessage("Failed to post status: " + message);
-    }
-
-    @Override
-    public void postStatusThrewException(Exception ex) {
-        view.displayErrorMessage("Posting status threw exception: " + ex.getMessage());
     }
 
     // Methods for posting status

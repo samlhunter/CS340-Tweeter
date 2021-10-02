@@ -18,25 +18,17 @@ import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public class StatusService extends Service {
-    public interface GetFeedObserver {
+    public interface GetFeedObserver extends PresenterObserver {
         void getFeedSucceeded(List<Status> statuses, boolean hasMorePages);
-        void getFeedFailed(String message);
-        void getFeedThrewException(Exception ex);
     }
-    public interface GetStoryObserver {
+    public interface GetStoryObserver extends PresenterObserver{
         void getStorySucceeded(List<Status> statuses, boolean hasMorePages);
-        void getStoryFailed(String message);
-        void getStoryThrewException(Exception ex);
     }
-    public interface PostStatusObserver {
+    public interface PostStatusObserver extends PresenterObserver{
         void postStatusSucceeded();
-        void postStatusFailed(String message);
-        void postStatusThrewException(Exception ex);
     }
-    public interface GetUserObserver {
+    public interface GetUserObserver extends PresenterObserver {
         void getUserSucceeded(User user);
-        void getUserFailed(String message);
-        void getUserThrewException(Exception ex);
     }
 
     public void getFeed(AuthToken authToken, User targetUser, int limit, Status lastStatus, GetFeedObserver observer) {
@@ -47,26 +39,25 @@ public class StatusService extends Service {
     /**
      * Message handler (i.e., observer) for GetFeedTask.
      */
-    private class GetFeedHandler extends Handler {
+    private class GetFeedHandler extends ServiceHandler {
 
         private GetFeedObserver observer;
 
-        public GetFeedHandler(GetFeedObserver observer) {this.observer = observer;}
+        private List<Status> statuses;
+
+        private boolean hasMorePages;
+
+        public GetFeedHandler(GetFeedObserver observer) {
+            super(observer);
+            this.observer = observer;
+        }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(GetFeedTask.SUCCESS_KEY);
-            if (success) {
-                List<Status> statuses = (List<Status>) msg.getData().getSerializable(GetFeedTask.ITEMS_KEY);
-                boolean hasMorePages = msg.getData().getBoolean(GetFeedTask.MORE_PAGES_KEY);
-                observer.getFeedSucceeded(statuses, hasMorePages);
-            } else if (msg.getData().containsKey(GetFeedTask.MESSAGE_KEY)) {
-                String message = msg.getData().getString(GetFeedTask.MESSAGE_KEY);
-                observer.getFeedFailed(message);
-            } else if (msg.getData().containsKey(GetFeedTask.EXCEPTION_KEY)) {
-                Exception ex = (Exception) msg.getData().getSerializable(GetFeedTask.EXCEPTION_KEY);
-                observer.getFeedThrewException(ex);
-            }
+        public void handleSucceeded(Message msg) {
+            this.statuses = (List<Status>) msg.getData().getSerializable(GetFeedTask.ITEMS_KEY);
+            this.hasMorePages = msg.getData().getBoolean(GetFeedTask.MORE_PAGES_KEY);
+            observer.getFeedSucceeded(statuses, hasMorePages);
+
         }
     }
 
@@ -75,86 +66,65 @@ public class StatusService extends Service {
         executeTask(getStoryTask);
     }
 
-    /**
-     * Message handler (i.e., observer) for GetStoryTask.
-     */
-    private class GetStoryHandler extends Handler {
-
-        private GetStoryObserver observer;
-
-        public GetStoryHandler(GetStoryObserver observer) {this.observer = observer; }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(GetStoryTask.SUCCESS_KEY);
-            if (success) {
-                List<Status> statuses = (List<Status>) msg.getData().getSerializable(GetStoryTask.ITEMS_KEY);
-                boolean hasMorePages = msg.getData().getBoolean(GetStoryTask.MORE_PAGES_KEY);
-                observer.getStorySucceeded(statuses, hasMorePages);
-            } else if (msg.getData().containsKey(GetStoryTask.MESSAGE_KEY)) {
-                String message = msg.getData().getString(GetStoryTask.MESSAGE_KEY);
-                observer.getStoryFailed(message);
-            } else if (msg.getData().containsKey(GetStoryTask.EXCEPTION_KEY)) {
-                Exception ex = (Exception) msg.getData().getSerializable(GetStoryTask.EXCEPTION_KEY);
-                observer.getStoryThrewException(ex);
-            }
-        }
-    }
-
     public void postStatus(AuthToken authToken, Status newStatus, PostStatusObserver observer) {
         PostStatusTask statusTask = new PostStatusTask(authToken, newStatus, new PostStatusHandler(observer));
         executeTask(statusTask);
     }
 
-    // PostStatusHandler
+//    public void getUser(AuthToken authToken, String alias, GetUserObserver observer) {
+//        GetUserTask getUserTask = new GetUserTask(authToken, alias, new StatusService.GetUserHandler(observer));
+//        executeTask(getUserTask);
+//    }
 
-    private class PostStatusHandler extends Handler {
+    // GetStoryHandler
+    private class GetStoryHandler extends ServiceHandler {
+        private GetStoryObserver observer;
+        private List<Status> statuses;
+        private boolean hasMorePages;
 
-        private PostStatusObserver observer;
-
-        public PostStatusHandler(PostStatusObserver observer) { this.observer = observer; }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(PostStatusTask.SUCCESS_KEY);
-            if (success) {
-                observer.postStatusSucceeded();
-            } else if (msg.getData().containsKey(PostStatusTask.MESSAGE_KEY)) {
-                String message = msg.getData().getString(PostStatusTask.MESSAGE_KEY);
-                observer.postStatusFailed(message);
-            } else if (msg.getData().containsKey(PostStatusTask.EXCEPTION_KEY)) {
-                Exception ex = (Exception) msg.getData().getSerializable(PostStatusTask.EXCEPTION_KEY);
-                observer.postStatusThrewException(ex);
-            }
-        }
-    }
-
-    public void getUser(AuthToken authToken, String alias, GetUserObserver observer) {
-        GetUserTask getUserTask = new GetUserTask(authToken, alias, new StatusService.GetUserHandler(observer));
-        executeTask(getUserTask);
-    }
-
-    private class GetUserHandler extends Handler {
-
-        private GetUserObserver observer;
-
-        public GetUserHandler(GetUserObserver observer) {
+        public GetStoryHandler(GetStoryObserver observer) {
+            super(observer);
             this.observer = observer;
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(GetUserTask.SUCCESS_KEY);
-            if (success) {
-                User user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
-                observer.getUserSucceeded(user);
-            } else if (msg.getData().containsKey(GetUserTask.MESSAGE_KEY)) {
-                String message = msg.getData().getString(GetUserTask.MESSAGE_KEY);
-                observer.getUserFailed(message);
-            } else if (msg.getData().containsKey(GetUserTask.EXCEPTION_KEY)) {
-                Exception ex = (Exception) msg.getData().getSerializable(GetUserTask.EXCEPTION_KEY);
-                observer.getUserThrewException(ex);
-            }
+        public void handleSucceeded(Message msg) {
+            this.statuses = (List<Status>) msg.getData().getSerializable(GetStoryTask.ITEMS_KEY);
+            this.hasMorePages = msg.getData().getBoolean(GetStoryTask.MORE_PAGES_KEY);
+            observer.getStorySucceeded(statuses, hasMorePages);
         }
     }
+
+
+    // PostStatusHandler
+    private class PostStatusHandler extends ServiceHandler {
+        private PostStatusObserver observer;
+
+        public PostStatusHandler(PostStatusObserver observer) {
+            super(observer);
+            this.observer = observer;
+        }
+
+        @Override
+        public void handleSucceeded(Message msg) {
+            observer.postStatusSucceeded();
+        }
+    }
+
+
+//    private class GetUserHandler extends ServiceHandler {
+//
+//        private GetUserObserver observer;
+//
+//        public GetUserHandler(GetUserObserver observer) {
+//            super(observer);
+//            this.observer = observer;
+//        }
+//
+//        @Override
+//        public void handleSucceeded(Message msg) {
+//            User user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
+//            observer.getUserSucceeded(user);
+//        }
+//    }
 }

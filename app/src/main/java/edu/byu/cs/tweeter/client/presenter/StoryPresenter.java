@@ -56,12 +56,12 @@ public class StoryPresenter implements StatusService.GetStoryObserver{
     }
 
     @Override
-    public void getStoryFailed(String message) {
+    public void failed(String message) {
         view.displayErrorMessage("Get story failed: " + message);
     }
 
     @Override
-    public void getStoryThrewException(Exception ex) {
+    public void exceptionThrown(Exception ex) {
         view.displayErrorMessage("Get story threw exception: " + ex.getMessage());
     }
 
@@ -73,12 +73,12 @@ public class StoryPresenter implements StatusService.GetStoryObserver{
         }
 
         @Override
-        public void getUserFailed(String message) {
+        public void failed(String message) {
             view.displayErrorMessage(message);
         }
 
         @Override
-        public void getUserThrewException(Exception ex) {
+        public void exceptionThrown(Exception ex) {
             view.displayErrorMessage("Failed to get user's profile because of exception: " + ex.getMessage());
         }
     }

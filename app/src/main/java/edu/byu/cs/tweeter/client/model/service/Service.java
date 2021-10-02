@@ -9,10 +9,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.FollowTask;
+import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetUserTask;
+import edu.byu.cs.tweeter.model.domain.AuthToken;
+import edu.byu.cs.tweeter.model.domain.User;
 
 public abstract class Service <T extends Runnable> {
 
-    public interface ServiceObserver {
+    public interface PresenterObserver {
         void failed (String message);
         void exceptionThrown (Exception ex);
     }
@@ -27,11 +30,16 @@ public abstract class Service <T extends Runnable> {
         executor.execute(task);
     }
 
+    public void getUser(AuthToken authToken, String alias, UserService.GetUserObserver observer) {
+        GetUserTask getUserTask = new GetUserTask(authToken, alias, new GetUserHandler(observer));
+        executeTask((T) getUserTask);
+    }
+
     protected abstract class ServiceHandler extends Handler {
 
-        private ServiceObserver observer;
+        private PresenterObserver observer;
 
-        public ServiceHandler(ServiceObserver observer) {
+        public ServiceHandler(PresenterObserver observer) {
             this.observer = observer;
         }
 
@@ -49,6 +57,22 @@ public abstract class Service <T extends Runnable> {
             }
         }
         public abstract void handleSucceeded(Message msg);
+    }
+
+    private class GetUserHandler extends ServiceHandler {
+        private UserService.GetUserObserver observer;
+        private User user;
+
+        public GetUserHandler(UserService.GetUserObserver observer) {
+            super(observer);
+            this.observer = observer;
+        }
+
+        @Override
+        public void handleSucceeded(Message msg) {
+            this.user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
+            observer.getUserSucceeded(user);
+        }
     }
 }
 

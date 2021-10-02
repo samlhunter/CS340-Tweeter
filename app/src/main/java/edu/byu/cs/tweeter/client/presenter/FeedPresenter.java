@@ -61,12 +61,12 @@ public class FeedPresenter implements StatusService.GetFeedObserver {
     }
 
     @Override
-    public void getFeedFailed(String message) {
+    public void failed(String message) {
         view.displayErrorMessage("Get feed failed: " + message);
     }
 
     @Override
-    public void getFeedThrewException(Exception ex) {
+    public void exceptionThrown(Exception ex) {
         view.displayErrorMessage("Get feed threw exception: " + ex.getMessage());
     }
 
@@ -77,12 +77,12 @@ public class FeedPresenter implements StatusService.GetFeedObserver {
         }
 
         @Override
-        public void getUserFailed(String message) {
+        public void failed(String message) {
             view.displayErrorMessage(message);
         }
 
         @Override
-        public void getUserThrewException(Exception ex) {
+        public void exceptionThrown(Exception ex) {
             view.displayErrorMessage("Failed to get user's profile because of exception: " + ex.getMessage());
         }
     }
