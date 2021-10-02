@@ -49,12 +49,12 @@ public class followingPresenter implements FollowService.GetFollowingObserver {
     }
 
     @Override
-    public void getFollowingFailed(String message) {
+    public void failed(String message) {
         view.displayErrorMessage("Get following failed: " + message);
     }
 
     @Override
-    public void getFollowingThrewException(Exception ex) {
+    public void exceptionThrown(Exception ex) {
         view.displayErrorMessage("Get following threw exception: " + ex.getMessage());
     }
 

@@ -13,16 +13,16 @@ import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import edu.byu.cs.tweeter.client.backgroundTask.GetUserTask;
-import edu.byu.cs.tweeter.client.backgroundTask.LoginTask;
-import edu.byu.cs.tweeter.client.backgroundTask.LogoutTask;
-import edu.byu.cs.tweeter.client.backgroundTask.RegisterTask;
+import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetUserTask;
+import edu.byu.cs.tweeter.client.model.service.backgroundTask.LoginTask;
+import edu.byu.cs.tweeter.client.model.service.backgroundTask.LogoutTask;
+import edu.byu.cs.tweeter.client.model.service.backgroundTask.RegisterTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
 
-public class UserService {
+public class UserService extends Service{
     public interface LoginObserver {
         void loginSucceeded(AuthToken authToken, User user);
         void loginFailed(String message);
@@ -50,14 +50,13 @@ public class UserService {
     public void login(String alias, String password, LoginObserver observer) {
         // Send the login request.
         LoginTask loginTask = new LoginTask(alias, password, new LoginHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(loginTask);
+        executeTask(loginTask);
     }
 
     public void logout(AuthToken authToken, LogoutObserver observer) {
+        // Logout the user
         LogoutTask logoutTask = new LogoutTask(authToken, new LogoutHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(logoutTask);
+        executeTask(logoutTask);
     }
 
     public void register(String firstName, String lastName, String alias, String password,
@@ -71,14 +70,12 @@ public class UserService {
 
         RegisterTask registerTask = new RegisterTask(firstName, lastName,
                 alias, password, imageBytesBase64, new RegisterHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(registerTask);
+        executeTask(registerTask);
     }
 
     public void getUser(AuthToken authToken, String alias, GetUserObserver observer) {
         GetUserTask getUserTask = new GetUserTask(authToken, alias, new GetUserHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(getUserTask);
+        executeTask(getUserTask);
     }
     /**
      * Message handler (i.e., observer) for LoginTask
