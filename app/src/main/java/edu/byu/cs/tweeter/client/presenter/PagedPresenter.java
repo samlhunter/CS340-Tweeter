@@ -33,7 +33,8 @@ public abstract class PagedPresenter<T> extends Presenter implements Service.Pre
 
     public void loadMoreItems() {
         if(!this.pagedLoading && this.pagedHasMorePages) {
-            view.displayInfoMessage("string");
+            view.setLoading(true);
+            view.displayInfoMessage("Loading More Items");
             this.pagedLoading = true;
             getItems();
         }
@@ -41,13 +42,16 @@ public abstract class PagedPresenter<T> extends Presenter implements Service.Pre
 
     public void getUser(String alias) {
         if (!isGettingUser) {
+            view.setLoading(true);
+            view.displayInfoMessage("Getting user's profile...");
             this.isGettingUser = true;
             new UserService().getUser(this.authToken, alias, new UserObserver());
         }
 
     }
 
-    protected void getStatusesSucceeded(boolean hasMorePages, T lastItem){
+    protected void getItemsSucceeded(boolean hasMorePages, T lastItem){
+        view.setLoading(false);
         this.pagedLoading = false;
         this.pagedHasMorePages = hasMorePages;
         this.lastItem = lastItem;

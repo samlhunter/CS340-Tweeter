@@ -163,7 +163,7 @@ public class FeedFragment extends Fragment implements FeedPresenter.FeedView {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    presenter.gettingUser(userAlias.getText().toString());
+                    presenter.getUser(userAlias.getText().toString());
                 }
             });
         }
@@ -198,7 +198,7 @@ public class FeedFragment extends Fragment implements FeedPresenter.FeedView {
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickable));
                             startActivity(intent);
                         } else {
-                            presenter.gettingUser(userAlias.getText().toString());
+                            presenter.getUser(userAlias.getText().toString());
                         }
                     }
 

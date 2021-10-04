@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.client.R;
-import edu.byu.cs.tweeter.client.cache.Cache;
-import edu.byu.cs.tweeter.client.presenter.followingPresenter;
+import edu.byu.cs.tweeter.client.presenter.FollowingPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.util.ImageUtils;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -31,7 +30,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the "Following" tab.
  */
-public class FollowingFragment extends Fragment implements followingPresenter.View {
+public class FollowingFragment extends Fragment implements FollowingPresenter.FollowingView {
 
     private static final String LOG_TAG = "FollowingFragment";
     private static final String USER_KEY = "UserKey";
@@ -41,7 +40,7 @@ public class FollowingFragment extends Fragment implements followingPresenter.Vi
 
     private boolean isLoading = false;
 
-    private followingPresenter presenter;
+    private FollowingPresenter presenter;
     private User user;
 
     private FollowingRecyclerViewAdapter followingRecyclerViewAdapter;
@@ -102,7 +101,7 @@ public class FollowingFragment extends Fragment implements followingPresenter.Vi
         View view = inflater.inflate(R.layout.fragment_following, container, false);
 
         user = (User) getArguments().getSerializable(USER_KEY);
-        presenter = new followingPresenter(this, Cache.getInstance().getCurrUserAuthToken(), user);
+        presenter = new FollowingPresenter(this, user);
         RecyclerView followingRecyclerView = view.findViewById(R.id.followingRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
@@ -146,7 +145,7 @@ public class FollowingFragment extends Fragment implements followingPresenter.Vi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    presenter.gotoUser(userAlias.getText().toString());
+                    presenter.getUser(userAlias.getText().toString());
                 }
             });
         }

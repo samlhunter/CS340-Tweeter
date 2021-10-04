@@ -10,27 +10,22 @@ import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public class StoryPresenter extends PagedPresenter<Status> implements StatusService.GetStoryObserver {
-
-    public interface View extends PagedView<Status> {}
+    public interface StoryView extends PagedView<Status> {}
 
     private static final int PAGE_SIZE = 10;
 
-    // private StoryPresenter.View view;
-
-    public StoryPresenter(View view, User targetUser) {
-        super(PAGE_SIZE, targetUser, Cache.getInstance().getCurrUserAuthToken(),  view);
+    public StoryPresenter(StoryView view, User targetUser) {
+        super(PAGE_SIZE, targetUser, Cache.getInstance().getCurrUserAuthToken(), view);
     }
 
     @Override
     protected void getItems() {
-        view.setLoading(true);
         new StatusService().getStory(this.authToken, this.targetUser, pageSize, (Status)lastItem, this);
     }
 
     @Override
     public void getStorySucceeded(List<Status> statuses, boolean hasMorePages) {
-        getStatusesSucceeded(hasMorePages, statuses.get(statuses.size() - 1));
-        view.setLoading(false);
+        getItemsSucceeded(hasMorePages, statuses.get(statuses.size() - 1));
         view.addItems(statuses);
     }
 }
