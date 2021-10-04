@@ -1,17 +1,11 @@
 package edu.byu.cs.tweeter.client.model.service;
 
-import android.os.Handler;
 import android.os.Message;
 
-import androidx.annotation.NonNull;
-
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetFeedTask;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetStoryTask;
-import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetUserTask;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.PostStatusTask;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
@@ -26,9 +20,6 @@ public class StatusService extends Service {
     }
     public interface PostStatusObserver extends PresenterObserver{
         void postStatusSucceeded();
-    }
-    public interface GetUserObserver extends PresenterObserver {
-        void getUserSucceeded(User user);
     }
 
     public void getFeed(AuthToken authToken, User targetUser, int limit, Status lastStatus, GetFeedObserver observer) {
@@ -71,11 +62,6 @@ public class StatusService extends Service {
         executeTask(statusTask);
     }
 
-//    public void getUser(AuthToken authToken, String alias, GetUserObserver observer) {
-//        GetUserTask getUserTask = new GetUserTask(authToken, alias, new StatusService.GetUserHandler(observer));
-//        executeTask(getUserTask);
-//    }
-
     // GetStoryHandler
     private class GetStoryHandler extends ServiceHandler {
         private GetStoryObserver observer;
@@ -110,21 +96,4 @@ public class StatusService extends Service {
             observer.postStatusSucceeded();
         }
     }
-
-
-//    private class GetUserHandler extends ServiceHandler {
-//
-//        private GetUserObserver observer;
-//
-//        public GetUserHandler(GetUserObserver observer) {
-//            super(observer);
-//            this.observer = observer;
-//        }
-//
-//        @Override
-//        public void handleSucceeded(Message msg) {
-//            User user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
-//            observer.getUserSucceeded(user);
-//        }
-//    }
 }

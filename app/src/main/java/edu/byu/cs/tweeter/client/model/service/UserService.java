@@ -2,22 +2,16 @@ package edu.byu.cs.tweeter.client.model.service;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Handler;
 import android.os.Message;
 import android.util.Base64;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-
 import java.io.ByteArrayOutputStream;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetUserTask;
+import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.LoginTask;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.LogoutTask;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.RegisterTask;
-import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
@@ -64,11 +58,6 @@ public class UserService extends Service{
                 alias, password, imageBytesBase64, new RegisterHandler(observer));
         executeTask(registerTask);
     }
-
-//    public void getUser(AuthToken authToken, String alias, GetUserObserver observer) {
-//        GetUserTask getUserTask = new GetUserTask(authToken, alias, new GetUserHandler(observer));
-//        executeTask(getUserTask);
-//    }
 
     // LoginHandler
     private class LoginHandler extends ServiceHandler {
@@ -130,22 +119,4 @@ public class UserService extends Service{
             observer.registerSucceeded(authToken,registeredUser);
         }
     }
-
-//    private class GetUserHandler extends ServiceHandler {
-//
-//        private GetUserObserver observer;
-//
-//        private User user;
-//
-//        public GetUserHandler(GetUserObserver observer) {
-//            super(observer);
-//            this.observer = observer;
-//        }
-//
-//        @Override
-//        public void handleSucceeded(Message msg) {
-//            this.user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
-//            observer.getUserSucceeded(user);
-//        }
-//    }
 }

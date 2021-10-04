@@ -56,6 +56,7 @@ public abstract class Service <T extends Runnable> {
                 observer.exceptionThrown(ex);
             }
         }
+
         public abstract void handleSucceeded(Message msg);
     }
 

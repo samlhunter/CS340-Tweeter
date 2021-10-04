@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.client.R;
-import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.presenter.FeedPresenter;
+import edu.byu.cs.tweeter.client.presenter.PagedPresenter;
 import edu.byu.cs.tweeter.client.presenter.StoryPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.util.ImageUtils;
@@ -40,7 +41,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the "Story" tab.
  */
-public class StoryFragment extends Fragment implements StoryPresenter.View {
+public class StoryFragment<Status> extends Fragment implements FeedPresenter.FeedView {
     private static final String LOG_TAG = "StoryFragment";
     private static final String USER_KEY = "UserKey";
 
@@ -106,7 +107,7 @@ public class StoryFragment extends Fragment implements StoryPresenter.View {
 
         //noinspection ConstantConditions
         user = (User) getArguments().getSerializable(USER_KEY);
-        presenter = new StoryPresenter(this, Cache.getInstance().getCurrUserAuthToken(), user);
+        presenter = new StoryPresenter(this, user);
         RecyclerView storyRecyclerView = view.findViewById(R.id.storyRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
@@ -188,7 +189,7 @@ public class StoryFragment extends Fragment implements StoryPresenter.View {
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickable));
                             startActivity(intent);
                         } else {
-                            presenter.gotoUser(userAlias.getText().toString());
+                            presenter.getUser(userAlias.getText().toString());
                         }
                     }
 

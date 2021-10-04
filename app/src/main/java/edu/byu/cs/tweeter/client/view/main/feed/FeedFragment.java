@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.client.R;
-import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.presenter.FeedPresenter;
+import edu.byu.cs.tweeter.client.presenter.PagedPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.util.ImageUtils;
 import edu.byu.cs.tweeter.model.domain.Status;
@@ -40,7 +40,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the "Feed" tab.
  */
-public class FeedFragment extends Fragment implements FeedPresenter.View {
+public class FeedFragment extends Fragment implements FeedPresenter.FeedView {
     private static final String LOG_TAG = "FeedFragment";
     private static final String USER_KEY = "UserKey";
 
@@ -71,10 +71,14 @@ public class FeedFragment extends Fragment implements FeedPresenter.View {
     public void displayInfoMessage(String message) { Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show(); }
 
     @Override
-    public void setLoading(boolean value) throws MalformedURLException {
+    public void setLoading(boolean value) {
         isLoading = value;
         if (isLoading) {
-            feedRecyclerViewAdapter.addLoadingFooter();
+            try {
+                feedRecyclerViewAdapter.addLoadingFooter();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
         else {
             feedRecyclerViewAdapter.removeLoadingFooter();
@@ -105,7 +109,7 @@ public class FeedFragment extends Fragment implements FeedPresenter.View {
 
         //noinspection ConstantConditions
         user = (User) getArguments().getSerializable(USER_KEY);
-        presenter = new FeedPresenter(this, Cache.getInstance().getCurrUserAuthToken(), user);
+        presenter = new FeedPresenter(this, user);
         RecyclerView feedRecyclerView = view.findViewById(R.id.feedRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
@@ -127,11 +131,7 @@ public class FeedFragment extends Fragment implements FeedPresenter.View {
     private void loadMoreItems() {
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(() -> {
-            try {
-                presenter.loadMoreItems();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            presenter.loadMoreItems();
         },0);
     }
 
@@ -163,7 +163,7 @@ public class FeedFragment extends Fragment implements FeedPresenter.View {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    presenter.gotoUser(userAlias.getText().toString());
+                    presenter.gettingUser(userAlias.getText().toString());
                 }
             });
         }
@@ -198,7 +198,7 @@ public class FeedFragment extends Fragment implements FeedPresenter.View {
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickable));
                             startActivity(intent);
                         } else {
-                            presenter.gotoUser(userAlias.getText().toString());
+                            presenter.gettingUser(userAlias.getText().toString());
                         }
                     }
 
