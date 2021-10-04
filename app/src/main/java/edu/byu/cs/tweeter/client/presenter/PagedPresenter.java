@@ -24,7 +24,7 @@ public abstract class PagedPresenter<T> extends Presenter implements Service.Pre
     protected boolean isGettingUser = false;
     protected PagedView view;
 
-    protected PagedPresenter(int pageSize, User targetUser, AuthToken authToken, View view){
+    protected PagedPresenter(int pageSize, User targetUser, AuthToken authToken, PagedView view){
         this.pageSize = pageSize;
         this.targetUser = targetUser;
         this.authToken = authToken;
@@ -33,7 +33,7 @@ public abstract class PagedPresenter<T> extends Presenter implements Service.Pre
 
     public void loadMoreItems() {
         if(!this.pagedLoading && this.pagedHasMorePages) {
-            view.displayInfoMessage();
+            view.displayInfoMessage("string");
             this.pagedLoading = true;
             getItems();
         }

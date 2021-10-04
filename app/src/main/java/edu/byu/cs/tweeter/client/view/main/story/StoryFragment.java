@@ -41,7 +41,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the "Story" tab.
  */
-public class StoryFragment<Status> extends Fragment implements FeedPresenter.FeedView {
+public class StoryFragment extends Fragment implements StoryPresenter.View {
     private static final String LOG_TAG = "StoryFragment";
     private static final String USER_KEY = "UserKey";
 
