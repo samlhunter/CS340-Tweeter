@@ -14,14 +14,13 @@ public class StoryPresenter extends PagedPresenter<Status> implements StatusServ
 
     private static final int PAGE_SIZE = 10;
 
-    public StoryPresenter(StoryView view, User targetUser) {
-        super(PAGE_SIZE, targetUser, Cache.getInstance().getCurrUserAuthToken(), view);
-    }
+    public StoryPresenter(StoryView view, User targetUser) { super(PAGE_SIZE, targetUser, Cache.getInstance().getCurrUserAuthToken(), view); }
 
     @Override
-    protected void getItems() {
-        new StatusService().getStory(this.authToken, this.targetUser, pageSize, (Status)lastItem, this);
-    }
+    protected void getItems() { new StatusService().getStory(this.authToken, this.targetUser, pageSize, (Status)lastItem, this); }
+
+    @Override
+    protected String getDescription() { return("Story"); }
 
     @Override
     public void getStorySucceeded(List<Status> statuses, boolean hasMorePages) {

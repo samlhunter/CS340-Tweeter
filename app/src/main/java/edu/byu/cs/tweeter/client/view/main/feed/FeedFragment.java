@@ -232,9 +232,7 @@ public class FeedFragment extends Fragment implements FeedPresenter.FeedView {
         /**
          * Creates an instance and loads the first page of feed data.
          */
-        FeedRecyclerViewAdapter() throws MalformedURLException {
-            loadMoreItems();
-        }
+        FeedRecyclerViewAdapter() throws MalformedURLException { loadMoreItems(); }
 
         /**
          * Adds new statuses to the list from which the RecyclerView retrieves the statuses it displays

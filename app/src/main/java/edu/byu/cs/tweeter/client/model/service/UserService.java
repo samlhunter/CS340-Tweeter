@@ -17,37 +17,26 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 
 public class UserService extends Service{
-    public interface LoginObserver extends PresenterObserver{
-        void loginSucceeded(AuthToken authToken, User user);
-    }
+    public interface LoginObserver extends PresenterObserver{ void loginSucceeded(AuthToken authToken, User user); }
 
-    public interface RegisterObserver extends PresenterObserver{
-        void registerSucceeded(AuthToken authToken, User user);
-    }
+    public interface RegisterObserver extends PresenterObserver{ void registerSucceeded(AuthToken authToken, User user); }
 
-    public interface LogoutObserver extends PresenterObserver{
-        void logoutSucceeded();
-    }
+    public interface LogoutObserver extends PresenterObserver{ void logoutSucceeded(); }
 
-    public interface GetUserObserver extends PresenterObserver{
-        void getUserSucceeded(User user);
-    }
+    public interface GetUserObserver extends PresenterObserver{ void getUserSucceeded(User user); }
 
     public void login(String alias, String password, LoginObserver observer) {
-        // Send the login request.
         LoginTask loginTask = new LoginTask(alias, password, new LoginHandler(observer));
         executeTask(loginTask);
     }
 
     public void logout(AuthToken authToken, LogoutObserver observer) {
-        // Logout the user
         LogoutTask logoutTask = new LogoutTask(authToken, new LogoutHandler(observer));
         executeTask(logoutTask);
     }
 
     public void register(String firstName, String lastName, String alias, String password,
                          ImageView imageToUpload, RegisterObserver observer) {
-        //Register the user
         Bitmap image = ((BitmapDrawable) imageToUpload.getDrawable()).getBitmap();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.JPEG, 100, bos);

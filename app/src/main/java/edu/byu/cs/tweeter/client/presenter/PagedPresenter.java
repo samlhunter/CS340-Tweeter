@@ -9,7 +9,7 @@ import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public abstract class PagedPresenter<T> extends Presenter implements Service.PresenterObserver {
-    public interface PagedView<U> extends View {
+    public interface PagedView<U> extends PresenterView {
         void setLoading(boolean value);
         void addItems(List<U> items);
         void navigateToUser(User user);
@@ -25,6 +25,7 @@ public abstract class PagedPresenter<T> extends Presenter implements Service.Pre
     protected PagedView view;
 
     protected PagedPresenter(int pageSize, User targetUser, AuthToken authToken, PagedView view){
+        super(view);
         this.pageSize = pageSize;
         this.targetUser = targetUser;
         this.authToken = authToken;
@@ -58,16 +59,6 @@ public abstract class PagedPresenter<T> extends Presenter implements Service.Pre
     }
 
     protected abstract void getItems();
-
-    @Override
-    public void failed(String message) {
-        view.displayErrorMessage("Service failed: " + message);
-    }
-
-    @Override
-    public void exceptionThrown(Exception ex) {
-        view.displayErrorMessage("Service threw exception: " + ex.getMessage());
-    }
 
     private class UserObserver implements UserService.GetUserObserver {
         @Override

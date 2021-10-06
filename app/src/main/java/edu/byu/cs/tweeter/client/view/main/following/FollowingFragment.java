@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.client.R;
-import edu.byu.cs.tweeter.client.presenter.FollowingPresenter;
+import edu.byu.cs.tweeter.client.presenter.followingPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.util.ImageUtils;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -30,7 +30,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the "Following" tab.
  */
-public class FollowingFragment extends Fragment implements FollowingPresenter.FollowingView {
+public class FollowingFragment extends Fragment implements followingPresenter.FollowingView {
 
     private static final String LOG_TAG = "FollowingFragment";
     private static final String USER_KEY = "UserKey";
@@ -40,7 +40,7 @@ public class FollowingFragment extends Fragment implements FollowingPresenter.Fo
 
     private boolean isLoading = false;
 
-    private FollowingPresenter presenter;
+    private followingPresenter presenter;
     private User user;
 
     private FollowingRecyclerViewAdapter followingRecyclerViewAdapter;
@@ -101,7 +101,7 @@ public class FollowingFragment extends Fragment implements FollowingPresenter.Fo
         View view = inflater.inflate(R.layout.fragment_following, container, false);
 
         user = (User) getArguments().getSerializable(USER_KEY);
-        presenter = new FollowingPresenter(this, user);
+        presenter = new followingPresenter(this, user);
         RecyclerView followingRecyclerView = view.findViewById(R.id.followingRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());

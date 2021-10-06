@@ -6,18 +6,19 @@ import edu.byu.cs.tweeter.client.model.service.UserService;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class RegisterPresenter implements UserService.RegisterObserver {
-    public interface View {
+public class RegisterPresenter extends Presenter implements UserService.RegisterObserver {
+    public interface RegisterView extends PresenterView{
         void navigateToUser(User user);
-        void displayErrorMessage(String message);
         void clearErrorMessage();
-        void displayInfoMessage(String message);
         void clearInfoMessage();
     }
 
-    private final View view;
+    private final RegisterView view;
 
-    public RegisterPresenter(View view) { this.view = view; }
+    public RegisterPresenter(RegisterView view) {
+        super(view);
+        this.view = view;
+    }
 
     public void register(String firstName, String lastName, String alias, String password, ImageView imageToUpload) {
         view.clearInfoMessage();
@@ -60,19 +61,12 @@ public class RegisterPresenter implements UserService.RegisterObserver {
     }
 
     @Override
+    protected String getDescription() { return("Register"); }
+
+    @Override
     public void registerSucceeded(AuthToken authToken, User user) {
         view.navigateToUser(user);
         view.clearErrorMessage();
         view.displayInfoMessage("Hello, " + user.getName());
-    }
-
-    @Override
-    public void failed(String message) {
-        view.displayErrorMessage("Login failed: " + message);
-    }
-
-    @Override
-    public void exceptionThrown(Exception ex) {
-        view.displayErrorMessage("Login threw exception: " + ex.getMessage());
     }
 }

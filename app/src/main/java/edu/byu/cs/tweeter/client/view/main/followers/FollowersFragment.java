@@ -31,7 +31,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the "Followers" tab.
  */
-public class FollowersFragment extends Fragment implements FollowersPresenter.View{
+public class FollowersFragment extends Fragment implements FollowersPresenter.FollowersView{
 
     private static final String LOG_TAG = "FollowersFragment";
     private static final String USER_KEY = "UserKey";
@@ -47,8 +47,8 @@ public class FollowersFragment extends Fragment implements FollowersPresenter.Vi
     private FollowersRecyclerViewAdapter followersRecyclerViewAdapter;
 
     @Override
-    public void addItems(List<User> followees) {
-        followersRecyclerViewAdapter.addItems(followees);
+    public void addItems(List<User> followers) {
+        followersRecyclerViewAdapter.addItems(followers);
     }
 
     @Override
@@ -59,14 +59,10 @@ public class FollowersFragment extends Fragment implements FollowersPresenter.Vi
     }
 
     @Override
-    public void displayErrorMessage(String message) {
-        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-    }
+    public void displayErrorMessage(String message) { Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show(); }
 
     @Override
-    public void displayInfoMessage(String message) {
-        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-    }
+    public void displayInfoMessage(String message) { Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show(); }
 
     @Override
     public void setLoading(boolean value) {
@@ -103,7 +99,7 @@ public class FollowersFragment extends Fragment implements FollowersPresenter.Vi
 
         //noinspection ConstantConditions
         user = (User) getArguments().getSerializable(USER_KEY);
-        presenter = new FollowersPresenter(this, Cache.getInstance().getCurrUserAuthToken(), user);
+        presenter = new FollowersPresenter(this, user);
         RecyclerView followersRecyclerView = view.findViewById(R.id.followersRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
@@ -148,7 +144,7 @@ public class FollowersFragment extends Fragment implements FollowersPresenter.Vi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    presenter.gotoUser(userAlias.getText().toString());
+                    presenter.getUser(userAlias.getText().toString());
                 }
             });
         }

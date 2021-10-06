@@ -12,30 +12,19 @@ import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public class StatusService extends Service {
-    public interface GetFeedObserver extends PresenterObserver {
-        void getFeedSucceeded(List<Status> statuses, boolean hasMorePages);
-    }
-    public interface GetStoryObserver extends PresenterObserver{
-        void getStorySucceeded(List<Status> statuses, boolean hasMorePages);
-    }
-    public interface PostStatusObserver extends PresenterObserver{
-        void postStatusSucceeded();
-    }
+    public interface GetFeedObserver extends PresenterObserver { void getFeedSucceeded(List<Status> statuses, boolean hasMorePages); }
+    public interface GetStoryObserver extends PresenterObserver{ void getStorySucceeded(List<Status> statuses, boolean hasMorePages); }
+    public interface PostStatusObserver extends PresenterObserver{ void postStatusSucceeded(); }
 
     public void getFeed(AuthToken authToken, User targetUser, int limit, Status lastStatus, GetFeedObserver observer) {
         GetFeedTask getFeedTask = new GetFeedTask(authToken, targetUser, limit, lastStatus, new GetFeedHandler(observer));
         executeTask(getFeedTask);
     }
 
-    /**
-     * Message handler (i.e., observer) for GetFeedTask.
-     */
+    // GetFeedHandler
     private class GetFeedHandler extends ServiceHandler {
-
         private GetFeedObserver observer;
-
         private List<Status> statuses;
-
         private boolean hasMorePages;
 
         public GetFeedHandler(GetFeedObserver observer) {
@@ -80,7 +69,6 @@ public class StatusService extends Service {
             observer.getStorySucceeded(statuses, hasMorePages);
         }
     }
-
 
     // PostStatusHandler
     private class PostStatusHandler extends ServiceHandler {

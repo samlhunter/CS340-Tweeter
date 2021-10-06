@@ -16,19 +16,12 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public class FollowService extends Service {
-
     public interface GetFollowingObserver extends PresenterObserver { void getFollowingSucceeded(List<User> users, boolean hasMorePages); }
-
     public interface GetFollowersObserver extends PresenterObserver { void getFollowersSucceeded(List<User> users, boolean hasMorePages); }
-
     public interface FollowObserver extends PresenterObserver { void followSucceeded(); }
-
     public interface UnfollowObserver extends PresenterObserver{ void unfollowSucceeded(); }
-
     public interface GetFollowingCountObserver extends PresenterObserver { void getFollowingCountSucceeded(int count); }
-
     public interface GetFollowersCountObserver extends PresenterObserver{ void getFollowersCountSucceeded(int count); }
-
     public interface IsFollowerObserver extends PresenterObserver{ void isFollowSucceeded(String text, int backgroundColor, int textColor); }
 
     public void getFollowing(AuthToken authToken, User targetUser, int limit, User lastFollowee, GetFollowingObserver observer) {
@@ -52,11 +45,9 @@ public class FollowService extends Service {
     }
 
     public void getCounts(AuthToken authToken, User targetUser, GetFollowersCountObserver followersObserver, GetFollowingCountObserver followingObserver) {
-        // Get count of most recently selected user's followers.
         GetFollowersCountTask followersCountTask = new GetFollowersCountTask(authToken, targetUser, new GetFollowersCountHandler(followersObserver));
         executeCountTask(followersCountTask);
 
-        // Get count of most recently selected user's followees (who they are following)
         GetFollowingCountTask followingCountTask = new GetFollowingCountTask(authToken, targetUser, new GetFollowingCountHandler(followingObserver));
         executeCountTask(followingCountTask);
     }
@@ -99,7 +90,7 @@ public class FollowService extends Service {
         @Override
         public void handleSucceeded(Message msg) {
             this.followers = (List<User>) msg.getData().getSerializable(GetFollowersTask.ITEMS_KEY);
-            this.hasMorePages = msg.getData().getBoolean(GetFollowingTask.MORE_PAGES_KEY);
+            this.hasMorePages = msg.getData().getBoolean(GetFollowersTask.MORE_PAGES_KEY);
             observer.getFollowersSucceeded(followers, hasMorePages);
         }
     }

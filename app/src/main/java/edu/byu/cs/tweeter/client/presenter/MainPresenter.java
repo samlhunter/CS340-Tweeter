@@ -17,7 +17,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class MainPresenter implements
+public class MainPresenter extends Presenter implements
         FollowService.GetFollowersCountObserver,
         FollowService.GetFollowingCountObserver,
         FollowService.FollowObserver,
@@ -26,11 +26,9 @@ public class MainPresenter implements
         UserService.LogoutObserver,
         StatusService.PostStatusObserver
 {
-    public interface View{
+    public interface MainView extends PresenterView {
         void updateFollowersCount(int count);
         void updateFollowingCount(int count);
-        void displayErrorMessage(String message);
-        void displayInfoMessage(String message);
         void clearInfoMessage();
         void clearErrorMessage();
         void updateFollowButton(String message, int backgroundColor, int textColor);
@@ -40,11 +38,12 @@ public class MainPresenter implements
         void navigateToMenu();
     }
 
-    private View view;
+    private MainView view;
     private AuthToken authToken;
     private User selectedUser;
 
-    public MainPresenter(View view, User selectedUser) {
+    public MainPresenter(MainView view, User selectedUser) {
+        super(view);
         this.view = view;
         this.authToken = Cache.getInstance().getCurrUserAuthToken();
         this.selectedUser = selectedUser;
@@ -86,15 +85,13 @@ public class MainPresenter implements
     }
 
     @Override
+    protected String getDescription() { return("Main"); }
+
+    @Override
     public void followSucceeded() {
         view.enableFollowButton(true);
         view.updateFollowButton("Following", R.color.white,R.color.lightGray);
     }
-    @Override
-    public void failed(String message) { view.displayErrorMessage("Follow user failed: " + message); }
-
-    @Override
-    public void exceptionThrown(Exception ex) { view.displayErrorMessage("Follow user threw exception: " + ex.getMessage()); }
 
     @Override
     public void unfollowSucceeded() {
@@ -172,7 +169,6 @@ public class MainPresenter implements
                 containedMentions.add(word);
             }
         }
-
         return containedMentions;
     }
 

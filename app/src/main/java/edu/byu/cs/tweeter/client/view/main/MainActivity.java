@@ -29,7 +29,7 @@ import edu.byu.cs.tweeter.model.domain.User;
  */
 public class MainActivity extends AppCompatActivity implements
         StatusDialogFragment.Observer,
-        MainPresenter.View
+        MainPresenter.MainView
 {
 
     private static final String LOG_TAG = "MainActivity";

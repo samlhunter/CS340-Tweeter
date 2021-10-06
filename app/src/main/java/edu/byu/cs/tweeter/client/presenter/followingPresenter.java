@@ -7,24 +7,22 @@ import edu.byu.cs.tweeter.client.model.service.FollowService;
 import edu.byu.cs.tweeter.client.model.service.UserService;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class FollowingPresenter extends PagedPresenter<User> implements FollowService.GetFollowingObserver {
+public class followingPresenter extends PagedPresenter<User> implements FollowService.GetFollowingObserver {
     public interface FollowingView extends PagedView<User> {}
 
     private static final int PAGE_SIZE = 10;
 
-    public FollowingPresenter(View view, User targetUser) {
-        super(PAGE_SIZE, targetUser, Cache.getInstance().getCurrUserAuthToken(), view);
-    }
+    public followingPresenter(FollowingView view, User targetUser) { super(PAGE_SIZE, targetUser, Cache.getInstance().getCurrUserAuthToken(), view); }
 
     @Override
-    protected void getItems()  {
-        new FollowService().getFollowing(this.authToken, this.targetUser, pageSize, (User)lastItem, this);
-    }
+    protected void getItems()  { new FollowService().getFollowing(this.authToken, this.targetUser, pageSize, (User)lastItem, this); }
+
+    @Override
+    protected String getDescription() { return("Following"); }
 
     @Override
     public void getFollowingSucceeded(List<User> users, boolean hasMorePages) {
         getItemsSucceeded(hasMorePages, users.get(users.size() - 1));
-        view.setLoading(false);
         view.addItems(users);
     }
 }

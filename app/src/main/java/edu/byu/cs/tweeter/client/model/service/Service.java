@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import edu.byu.cs.tweeter.client.model.service.backgroundTask.BackgroundTask;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.FollowTask;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetUserTask;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
@@ -36,27 +37,24 @@ public abstract class Service <T extends Runnable> {
     }
 
     protected abstract class ServiceHandler extends Handler {
-
         private PresenterObserver observer;
-
         public ServiceHandler(PresenterObserver observer) {
             this.observer = observer;
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(FollowTask.SUCCESS_KEY);
+            boolean success = msg.getData().getBoolean(BackgroundTask.SUCCESS_KEY);
             if (success) {
                 handleSucceeded(msg);
-            } else if (msg.getData().containsKey(FollowTask.MESSAGE_KEY)) {
-                String message = msg.getData().getString(FollowTask.MESSAGE_KEY);
+            } else if (msg.getData().containsKey(BackgroundTask.MESSAGE_KEY)) {
+                String message = msg.getData().getString(BackgroundTask.MESSAGE_KEY);
                 observer.failed(message);
-            } else if (msg.getData().containsKey(FollowTask.EXCEPTION_KEY)) {
-                Exception ex = (Exception) msg.getData().getSerializable(FollowTask.EXCEPTION_KEY);
+            } else if (msg.getData().containsKey(BackgroundTask.EXCEPTION_KEY)) {
+                Exception ex = (Exception) msg.getData().getSerializable(BackgroundTask.EXCEPTION_KEY);
                 observer.exceptionThrown(ex);
             }
         }
-
         public abstract void handleSucceeded(Message msg);
     }
 
