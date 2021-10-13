@@ -41,12 +41,14 @@ public class MainPresenter extends Presenter implements
     private MainView view;
     private AuthToken authToken;
     private User selectedUser;
+    private StatusService service;
 
     public MainPresenter(MainView view, User selectedUser) {
         super(view);
         this.view = view;
         this.authToken = Cache.getInstance().getCurrUserAuthToken();
         this.selectedUser = selectedUser;
+        this.service = new StatusService();
     }
 
     // Logic for Follow Count
@@ -62,6 +64,15 @@ public class MainPresenter extends Presenter implements
         view.updateFollowersCount(count);
     }
 
+    public MainView getView() { return view; }
+
+    public AuthToken getAuthToken() { return authToken; }
+
+    public StatusService getService() { return service; }
+
+    public void setService(StatusService service) {
+        this.service = service;
+    }
 
     // Logic for handling Follow Action
     public void updateFollow(String buttonText) {
@@ -118,32 +129,40 @@ public class MainPresenter extends Presenter implements
         view.navigateToMenu();
     }
 
-    // Post Status Logic
-    public void postStatus(String post) {
-        view.displayInfoMessage("Posting status...");
-        try{
-            Status newStatus = new Status(post, Cache.getInstance().getCurrUser(), getFormattedDateTime(), parseURLs(post), parseMentions(post));
-            new StatusService().postStatus(authToken, newStatus, this);
+    public Status getStatus (String post) {
+        try {
+            return new Status(post, Cache.getInstance().getCurrUser(), getFormattedDateTime(), parseURLs(post), parseMentions(post));
         }
         catch (Exception ex) {
-            view.displayErrorMessage("Exception caught when parsing DateTime");
+            getView().displayErrorMessage("Exception caught when generating status: " + ex.getMessage());
+            return null;
+        }
+    }
+
+    // Post Status Logic
+    public void postStatus(String post) {
+        try {
+            getView().displayInfoMessage("Posting status...");
+            Status newStatus = getStatus(post);
+            getService().postStatus(getAuthToken(), newStatus, getPostStatusObserver());
+        } catch(Exception ex) {
+            getView().displayErrorMessage("Exception caught when posting status: " + ex.getMessage());
         }
     }
 
     @Override
     public void postStatusSucceeded() {
-        view.displayInfoMessage("Status successfully posted");
+        getView().displayInfoMessage("Successfully Posted!");
     }
 
     // Methods for posting status
-    public String getFormattedDateTime() throws ParseException {
+    public String getFormattedDateTime() throws ParseException{
         SimpleDateFormat userFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat statusFormat = new SimpleDateFormat("MMM d yyyy h:mm aaa");
-
         return statusFormat.format(userFormat.parse(LocalDate.now().toString() + " " + LocalTime.now().toString().substring(0, 8)));
     }
 
-    public List<String> parseURLs(String post) throws MalformedURLException {
+    public List<String> parseURLs(String post) {
         List<String> containedUrls = new ArrayList<>();
         for (String word : post.split("\\s")) {
             if (word.startsWith("http://") || word.startsWith("https://")) {
@@ -197,4 +216,24 @@ public class MainPresenter extends Presenter implements
             return word.length();
         }
     }
+
+    public StatusService.PostStatusObserver getPostStatusObserver() { return new StatusService.PostStatusObserver()
+    {
+        @Override
+        public void postStatusSucceeded() {
+            getView().displayInfoMessage("Successfully Posted!");
+        }
+
+        @Override
+        public void failed(String message) {
+            getView().displayInfoMessage("Failed to post status: " + message);
+        }
+
+        @Override
+        public void exceptionThrown(Exception ex) {
+            getView().displayErrorMessage("Failed to post status because of exception: " + ex.getMessage());
+        }
+    };
+    }
+
 }

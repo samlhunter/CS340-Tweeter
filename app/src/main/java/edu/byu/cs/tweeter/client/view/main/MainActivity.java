@@ -122,7 +122,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onStatusPosted(String post) {
-        presenter.postStatus(post);
+        try {
+            presenter.postStatus(post);
+        } catch (Exception ex) {
+            displayErrorMessage("Exception Caught posting Status: " + ex.getMessage());
+        }
     }
 
     @Override
