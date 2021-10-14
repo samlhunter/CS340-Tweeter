@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.exceptions.base.MockitoException;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -79,7 +80,7 @@ public class PostStatusTest {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 StatusService.PostStatusObserver observer = invocation.getArgument(2);
-                observer.failed("Failed to post status: " + Mockito.any());
+                observer.failed("Failed to post status: " + Mockito.anyString());
                 return null;
             }
         };
@@ -90,7 +91,7 @@ public class PostStatusTest {
         mainPresenterSpy.postStatus("sample post");
 
         Mockito.verify(mockMainView).displayInfoMessage("Posting status...");
-        Mockito.verify(mockMainView).displayInfoMessage("Failed to post status: " + Mockito.any());
+        Mockito.verify(mockMainView).displayInfoMessage("Failed to post status: " + Mockito.anyString());
     }
 
     @Test
@@ -99,7 +100,7 @@ public class PostStatusTest {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 StatusService.PostStatusObserver observer = invocation.getArgument(2);
-                observer.failed("Failed to post status because of exception: " + Mockito.any());
+                observer.exceptionThrown(new Exception());
                 return null;
             }
         };
@@ -109,7 +110,8 @@ public class PostStatusTest {
         // Run case
         mainPresenterSpy.postStatus("sample post");
 
-        Mockito.verify(mockMainView).displayInfoMessage("Failed to post status because of exception: " + Mockito.any());
+        Mockito.verify(mockMainView).displayInfoMessage("Posting status...");
+        Mockito.verify(mockMainView).displayInfoMessage("Failed to post status: " + Mockito.anyString());
     }
 
 }
