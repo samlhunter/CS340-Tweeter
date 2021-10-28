@@ -4,9 +4,13 @@ import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFolloweeCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersCountRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFolloweeCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersCountResponse;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 import edu.byu.cs.tweeter.model.net.response.RegisterResponse;
 
@@ -46,6 +50,27 @@ public class ServerFacade {
             throw new RuntimeException(response.getMessage());
         }
     }
+
+    public GetFollowersCountResponse getFollowersCount(GetFollowersCountRequest request, String urlPath) throws IOException, TweeterRemoteException {
+        GetFollowersCountResponse response = clientCommunicator.doPost(urlPath, request, null, GetFollowersCountResponse.class);
+        if(response.isSuccess()) {
+            return response;
+        }
+        else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public GetFolloweeCountResponse getFolloweeCount(GetFolloweeCountRequest request, String urlPath) throws IOException, TweeterRemoteException {
+        GetFolloweeCountResponse response = clientCommunicator.doPost(urlPath, request, null, GetFolloweeCountResponse.class);
+        if(response.isSuccess()) {
+            return response;
+        }
+        else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
     /**
      * Returns the users that the user specified in the request is following. Uses information in
      * the request object to limit the number of followees returned and to return the next set of

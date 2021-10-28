@@ -44,7 +44,7 @@ class Response implements Serializable {
      *
      * @return an error message or null if the response indicates a successful result.
      */
-    public String getMessage() {
+    public java.lang.String getMessage() {
         return message;
     }
 }

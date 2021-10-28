@@ -2,12 +2,12 @@ package edu.byu.cs.tweeter.model.net.request;
 
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class GetFollowingCountRequest {
+public class GetFolloweeCountRequest {
     private User targetUser;
 
-    public GetFollowingCountRequest() {}
+    public GetFolloweeCountRequest() {}
 
-    public GetFollowingCountRequest(User targetUser) {
+    public GetFolloweeCountRequest(User targetUser) {
         this.targetUser = targetUser;
     }
 

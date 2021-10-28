@@ -5,10 +5,8 @@ import android.os.Handler;
 import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
-import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
-import edu.byu.cs.tweeter.model.net.request.LoginRequest;
-import edu.byu.cs.tweeter.model.net.response.LoginResponse;
-import edu.byu.cs.tweeter.util.Pair;
+import edu.byu.cs.tweeter.model.net.request.GetFolloweeCountRequest;
+import edu.byu.cs.tweeter.model.net.response.GetFolloweeCountResponse;
 
 /**
  * Background task that queries how many other users a specified user is following.
@@ -21,18 +19,18 @@ public class GetFollowingCountTask extends GetCountTask {
 
     @Override
     protected int runCountTask() {
-        GetFollowingCountRequest getFollowingCountRequest = new GetFollowingCountRequest (getTargetUser());
+        GetFolloweeCountRequest getFolloweeCountRequest = new GetFolloweeCountRequest(getTargetUser());
         try {
-            GetFollowing = new ServerFacade().login(loginRequest, "/getFollowingCount");
-            if (loginResponse.isSuccess()) {
-                return new Pair<>(loginResponse.getUser(), loginResponse.getAuthToken());
+            GetFolloweeCountResponse getFolloweeCountResponse= new ServerFacade().getFolloweeCount(getFolloweeCountRequest, "/getFolloweeCount");
+            if (getFolloweeCountResponse.isSuccess()) {
+                return (getFolloweeCountResponse.getCount());
             }
             else {
-                sendFailedMessage(loginResponse.getMessage());
+                sendFailedMessage(getFolloweeCountResponse.getMessage());
             }
         } catch (Exception e) {
             sendExceptionMessage(e);
         }
-        return null;
+        return 0;
     }
 }
