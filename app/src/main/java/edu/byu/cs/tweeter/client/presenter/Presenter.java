@@ -1,9 +1,6 @@
 package edu.byu.cs.tweeter.client.presenter;
 
-import java.util.List;
-
 import edu.byu.cs.tweeter.client.model.service.Service;
-import edu.byu.cs.tweeter.model.domain.Status;
 
 public abstract class Presenter implements Service.PresenterObserver{
     public interface PresenterView {
