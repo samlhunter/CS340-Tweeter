@@ -11,6 +11,6 @@ public class GetFolloweeCountHandler implements RequestHandler<GetFolloweeCountR
     @Override
     public GetFolloweeCountResponse handleRequest(GetFolloweeCountRequest getFolloweeCountRequest, Context context) {
         FollowService followService = new FollowService();
-        return followService.getFolloweeCount(getFolloweeCountRequest.getTargetUser());
+        return followService.getFolloweeCount(getFolloweeCountRequest.getAuthToken(), getFolloweeCountRequest.getUserName());
     }
 }

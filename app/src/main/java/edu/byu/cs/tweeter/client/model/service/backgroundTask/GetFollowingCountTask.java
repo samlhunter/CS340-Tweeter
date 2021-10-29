@@ -19,9 +19,9 @@ public class GetFollowingCountTask extends GetCountTask {
 
     @Override
     protected int runCountTask() {
-        GetFolloweeCountRequest getFolloweeCountRequest = new GetFolloweeCountRequest(getTargetUser());
+        GetFolloweeCountRequest getFolloweeCountRequest = new GetFolloweeCountRequest(authToken, getTargetUser().getAlias());
         try {
-            GetFolloweeCountResponse getFolloweeCountResponse= new ServerFacade().getFolloweeCount(getFolloweeCountRequest, "/getFolloweeCount");
+            GetFolloweeCountResponse getFolloweeCountResponse= new ServerFacade().getFolloweeCount(getFolloweeCountRequest, "/getfolloweecount");
             if (getFolloweeCountResponse.isSuccess()) {
                 return (getFolloweeCountResponse.getCount());
             }

@@ -1,10 +1,16 @@
 package edu.byu.cs.tweeter.server.service;
 
-import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.domain.AuthToken;
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFolloweeCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowersCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
+import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 import edu.byu.cs.tweeter.server.dao.FollowDAO;
 
 /**
@@ -21,17 +27,31 @@ public class FollowService {
      * @param request contains the data required to fulfill the request.
      * @return the followees.
      */
+    public FollowResponse followUser(FollowRequest request) {
+        FollowResponse response = new FollowResponse();
+        return response;
+    }
+
+    public UnfollowResponse unfollowUser(UnfollowRequest request) {
+        UnfollowResponse response = new UnfollowResponse();
+        return response;
+    }
+
     public FollowingResponse getFollowees(FollowingRequest request) {
         return getFollowingDAO().getFollowees(request);
     }
 
-    public GetFollowersCountResponse getFollowingCount(User targetUser) {
-        GetFollowersCountResponse response = new GetFollowersCountResponse(getFollowingDAO().getFollowingCount(targetUser));
+    public GetFollowersResponse getFollowers(GetFollowersRequest request) {
+        return getFollowingDAO().getFollowers(request);
+    }
+
+    public GetFollowersCountResponse getFollowingCount(AuthToken authToken, String userName) {
+        GetFollowersCountResponse response = new GetFollowersCountResponse(getFollowingDAO().getFollowingCount(authToken, userName));
         return response;
     }
 
-    public GetFolloweeCountResponse getFolloweeCount(User targetUser) {
-        GetFolloweeCountResponse response = new GetFolloweeCountResponse(getFollowingDAO().getFolloweeCount(targetUser));
+    public GetFolloweeCountResponse getFolloweeCount(AuthToken authToken, String userName) {
+        GetFolloweeCountResponse response = new GetFolloweeCountResponse(getFollowingDAO().getFolloweeCount(authToken, userName));
         return response;
     }
     /**

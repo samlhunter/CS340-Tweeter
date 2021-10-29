@@ -3,18 +3,30 @@ package edu.byu.cs.tweeter.client.model.net;
 import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFolloweeCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowersCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
+import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
+import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFolloweeCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowersCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
+import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
+import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.model.net.response.RegisterResponse;
+import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 
 /**
  * Acts as a Facade to the Tweeter server. All network requests to the server should go through
@@ -44,7 +56,7 @@ public class ServerFacade {
         }
     }
 
-    public LogoutResponse logout(LogoutRequest request, String urlPath) throws TweeterRemoteException {
+    public LogoutResponse logout(LogoutRequest request, String urlPath) throws IOException, TweeterRemoteException {
         LogoutResponse response = clientCommunicator.doPost(urlPath, request, null, LogoutResponse.class);
 
         if(response.isSuccess()) {
@@ -59,6 +71,26 @@ public class ServerFacade {
         if(response.isSuccess()) {
             return response;
         } else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public FollowResponse followUser(FollowRequest request, String urlPath) throws IOException, TweeterRemoteException {
+        FollowResponse response = clientCommunicator.doPost(urlPath, request, null, FollowResponse.class);
+        if (response.isSuccess()) {
+            return response;
+        }
+        else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public UnfollowResponse unfollowUser(UnfollowRequest request, String urlPath) throws IOException, TweeterRemoteException {
+        UnfollowResponse response = clientCommunicator.doPost(urlPath, request, null, UnfollowResponse.class);
+        if (response.isSuccess()) {
+            return response;
+        }
+        else {
             throw new RuntimeException(response.getMessage());
         }
     }
@@ -100,6 +132,49 @@ public class ServerFacade {
         if(response.isSuccess()) {
             return response;
         } else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public GetFollowersResponse getFollowers(GetFollowersRequest request, String urlPath) throws IOException, TweeterRemoteException {
+        GetFollowersResponse response = clientCommunicator.doPost(urlPath, request, null, GetFollowersResponse.class);
+        if(response.isSuccess()) {
+            return response;
+        } else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public PostStatusResponse postStatus(PostStatusRequest request, String urlPath)
+        throws IOException, TweeterRemoteException {
+
+        PostStatusResponse response = clientCommunicator.doPost(urlPath, request, null, PostStatusResponse.class);
+
+        if(response.isSuccess()) {
+            return response;
+        }
+        else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public GetFeedResponse getFeed(GetFeedRequest request, String urlPath) throws IOException, TweeterRemoteException {
+        GetFeedResponse response = clientCommunicator.doPost(urlPath, request, null, GetFeedResponse.class);
+
+        if(response.isSuccess()) {
+            return response;
+        }
+        else {
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public GetStoryResponse getStory(GetStoryRequest request, String urlPath) throws IOException, TweeterRemoteException {
+        GetStoryResponse response = clientCommunicator.doPost(urlPath, request, null, GetStoryResponse.class);
+        if(response.isSuccess()) {
+            return response;
+        }
+        else {
             throw new RuntimeException(response.getMessage());
         }
     }

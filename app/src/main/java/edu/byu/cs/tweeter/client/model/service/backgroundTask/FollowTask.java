@@ -3,8 +3,11 @@ package edu.byu.cs.tweeter.client.model.service.backgroundTask;
 import android.os.Bundle;
 import android.os.Handler;
 
+import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 
 /**
  * Background task that establishes a following relationship between two users.
@@ -22,8 +25,19 @@ public class FollowTask extends AuthorizedTask {
 
     @Override
     protected void runTask() {
-        // We could do this from the presenter, without a task and handler, but we will
-        // eventually access the database from here when we aren't using dummy data.
+        FollowRequest followRequest = new FollowRequest(authToken, followee.getAlias());
+
+        try {
+            FollowResponse followResponse = new ServerFacade().followUser(followRequest, "/follow");
+            if (followResponse.isSuccess()) {
+                return;
+            }
+            else {
+                sendFailedMessage(followResponse.getMessage());
+            }
+        } catch (Exception e) {
+            sendExceptionMessage(e);
+        }
     }
 
     @Override

@@ -5,13 +5,10 @@ package edu.byu.cs.tweeter.client.view.login;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.exceptions.base.MockitoException;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.text.ParseException;
 import java.util.Arrays;
 
 import edu.byu.cs.tweeter.client.cache.Cache;
