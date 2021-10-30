@@ -5,8 +5,11 @@ import android.os.Handler;
 
 import java.util.Random;
 
+import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.IsFollowerRequest;
+import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 
 /**
  * Background task that determines if one user is following another.
@@ -35,7 +38,17 @@ public class IsFollowerTask extends AuthorizedTask {
 
     @Override
     protected void runTask() {
-        isFollower = new Random().nextInt() > 0;
+        IsFollowerRequest isFollowerRequest = new IsFollowerRequest(authToken, follower, followee);
+
+        try {
+            IsFollowerResponse isFollowerResponse = new ServerFacade().getIsFollower(isFollowerRequest, "/isfollower");
+            if (isFollowerResponse.isSuccess()) {
+                return;
+            }
+        } catch (Exception e) {
+            sendExceptionMessage(e);
+        }
+
     }
 
     @Override

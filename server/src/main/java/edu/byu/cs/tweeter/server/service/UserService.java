@@ -3,11 +3,13 @@ package edu.byu.cs.tweeter.server.service;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
+import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
 import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
+import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
@@ -34,6 +36,10 @@ public class UserService {
         return new LogoutResponse();
     }
 
+    public GetUserResponse getUser(GetUserRequest request) {
+        GetUserResponse response = new GetUserResponse(getRequestedUser(request.getUserAlias()));
+        return response;
+    }
     /**
      * Returns the dummy user to be returned by the login operation.
      * This is written as a separate method to allow mocking of the dummy user.
@@ -42,6 +48,10 @@ public class UserService {
      */
     User getDummyUser() {
         return getFakeData().getFirstUser();
+    }
+
+    User getRequestedUser(String alias) {
+        return getFakeData().findUserByAlias(alias);
     }
 
     /**

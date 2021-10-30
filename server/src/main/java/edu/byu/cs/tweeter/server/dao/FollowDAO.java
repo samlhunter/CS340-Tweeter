@@ -2,6 +2,7 @@ package edu.byu.cs.tweeter.server.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -139,6 +140,10 @@ public class FollowDAO {
         }
 
         return followersIndex;
+    }
+
+    public boolean getIsFollower(AuthToken authToken, User follower, User followee) {
+        return new Random().nextInt() > 0;
     }
 
     /**
