@@ -2,7 +2,6 @@ package edu.byu.cs.tweeter.model.net.request;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
-import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 
 public class IsFollowerRequest {
     private AuthToken authToken;

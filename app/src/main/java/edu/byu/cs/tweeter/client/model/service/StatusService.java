@@ -1,5 +1,6 @@
 package edu.byu.cs.tweeter.client.model.service;
 
+import android.os.Looper;
 import android.os.Message;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public class StatusService extends Service {
     }
 
     public void getStory(AuthToken authToken, User targetUser, int limit, Status lastStatus, GetStoryObserver observer) {
-        GetStoryTask getStoryTask = new GetStoryTask(authToken, targetUser, limit, lastStatus, new GetStoryHandler(observer));
+        GetStoryTask getStoryTask = new GetStoryTask(authToken, targetUser, limit, lastStatus, new GetStoryHandler(Looper.getMainLooper() ,observer));
         executeTask(getStoryTask);
     }
 
@@ -59,6 +60,11 @@ public class StatusService extends Service {
 
         public GetStoryHandler(GetStoryObserver observer) {
             super(observer);
+            this.observer = observer;
+        }
+
+        public GetStoryHandler(Looper looper, GetStoryObserver observer) {
+            super(looper, observer);
             this.observer = observer;
         }
 

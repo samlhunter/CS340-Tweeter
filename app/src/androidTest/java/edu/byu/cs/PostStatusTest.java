@@ -1,6 +1,6 @@
 
 
-package edu.byu.cs.tweeter.client.view.login;
+package edu.byu.cs;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,8 +12,8 @@ import org.mockito.stubbing.Answer;
 import java.util.Arrays;
 
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.model.service.StatusService;
 import edu.byu.cs.tweeter.client.presenter.MainPresenter;
-import edu.byu.cs.tweeter.client.service.StatusService;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;

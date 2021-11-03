@@ -6,7 +6,6 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.server.service.StatusService;
-import edu.byu.cs.tweeter.server.service.UserService;
 
 public class PostStatusHandler implements RequestHandler<PostStatusRequest, PostStatusResponse> {
 

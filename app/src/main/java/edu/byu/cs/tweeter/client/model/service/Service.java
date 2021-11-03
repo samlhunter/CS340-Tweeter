@@ -1,6 +1,7 @@
 package edu.byu.cs.tweeter.client.model.service;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import java.util.concurrent.Executors;
 
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.BackgroundTask;
 import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetUserTask;
+import edu.byu.cs.tweeter.client.model.service.observer.ServiceObserver;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
@@ -38,6 +40,11 @@ public abstract class Service <T extends Runnable> {
     protected abstract class ServiceHandler extends Handler {
         private PresenterObserver observer;
         public ServiceHandler(PresenterObserver observer) {
+            this.observer = observer;
+        }
+
+        public ServiceHandler(Looper looper, PresenterObserver observer) {
+            super(looper);
             this.observer = observer;
         }
 
