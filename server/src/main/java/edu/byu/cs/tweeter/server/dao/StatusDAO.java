@@ -6,11 +6,14 @@ import java.util.List;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
 import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
+import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
 import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
+import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 
-public class StatusDAO {
+public class StatusDAO implements IStatusDAO {
+    @Override
     public GetFeedResponse getFeed(GetFeedRequest request) {
         assert request.getLimit() > 0;
         assert request.getUserAlias() != null;
@@ -34,6 +37,7 @@ public class StatusDAO {
         return new GetFeedResponse(responseStatuses, hasMorePages);
     }
 
+    @Override
     public GetStoryResponse getStory(GetStoryRequest request) {
         assert request.getLimit() > 0;
         assert request.getUserAlias() != null;
@@ -55,6 +59,11 @@ public class StatusDAO {
             }
         }
         return new GetStoryResponse(responseStatuses, hasMorePages);
+    }
+
+    @Override
+    public PostStatusResponse postStatus(PostStatusRequest request) {
+        return new PostStatusResponse();
     }
 
     private int getStatusesStartingIndex(Status lastStatus, List<Status> allStatuses) {

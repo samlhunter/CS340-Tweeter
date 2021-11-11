@@ -12,6 +12,7 @@ import edu.byu.cs.tweeter.model.net.response.GetFolloweeCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowersCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
+import edu.byu.cs.tweeter.model.net.response.PagedResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 import edu.byu.cs.tweeter.server.dao.FollowDAO;
 
@@ -19,7 +20,11 @@ import edu.byu.cs.tweeter.server.dao.FollowDAO;
  * Contains the business logic for getting the users a user is following.
  */
 public class FollowService {
+    DAOFactory factory;
 
+    public FollowService() {
+        this.factory = new AWSDAOFactory();
+    }
     /**
      * Returns the users that the user specified in the request is following. Uses information in
      * the request object to limit the number of followees returned and to return the next set of
@@ -30,35 +35,40 @@ public class FollowService {
      * @return the followees.
      */
     public FollowResponse followUser(FollowRequest request) {
+//        return GetFollowingDAO().followUser(request);
         FollowResponse response = new FollowResponse();
         return response;
     }
 
     public UnfollowResponse unfollowUser(UnfollowRequest request) {
+//        return GetFollowingDAO().unfollowUser(request);
         UnfollowResponse response = new UnfollowResponse();
         return response;
     }
 
     public FollowingResponse getFollowees(FollowingRequest request) {
-        return getFollowingDAO().getFollowees(request);
+        return GetFollowingDAO().getFollowees(request);
     }
 
     public GetFollowersResponse getFollowers(GetFollowersRequest request) {
-        return getFollowingDAO().getFollowers(request);
+        return GetFollowingDAO().getFollowers(request);
     }
 
     public GetFollowersCountResponse getFollowingCount(AuthToken authToken, String userName) {
-        GetFollowersCountResponse response = new GetFollowersCountResponse(getFollowingDAO().getFollowingCount(authToken, userName));
+//        return GetFollowingDAO().getFollowingCount(authToken, userName);
+        GetFollowersCountResponse response = new GetFollowersCountResponse(GetFollowingDAO().getFollowingCount(authToken, userName));
         return response;
     }
 
     public GetFolloweeCountResponse getFolloweeCount(AuthToken authToken, String userName) {
-        GetFolloweeCountResponse response = new GetFolloweeCountResponse(getFollowingDAO().getFolloweeCount(authToken, userName));
+//        return GetFollowingDAO().getFolloweeCount(authToken, userName);
+        GetFolloweeCountResponse response = new GetFolloweeCountResponse(GetFollowingDAO().getFolloweeCount(authToken, userName));
         return response;
     }
 
     public IsFollowerResponse isFollower(AuthToken authToken, User follower, User followee) {
-        IsFollowerResponse response = new IsFollowerResponse(getFollowingDAO().getIsFollower(authToken, follower, followee));
+//        return GetFollowingDAO().getIsFollower(authToken, follower, followee);
+        IsFollowerResponse response = new IsFollowerResponse(GetFollowingDAO().getIsFollower(authToken, follower, followee));
         return response;
     }
     /**
@@ -68,7 +78,7 @@ public class FollowService {
      *
      * @return the instance.
      */
-    FollowDAO getFollowingDAO() {
-        return new FollowDAO();
+    FollowDAO GetFollowingDAO() {
+        return factory.getFollowDAO();
     }
 }

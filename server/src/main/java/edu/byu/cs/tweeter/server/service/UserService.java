@@ -2,6 +2,7 @@ package edu.byu.cs.tweeter.server.service;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
 import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
@@ -10,29 +11,37 @@ import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.model.net.response.RegisterResponse;
+import edu.byu.cs.tweeter.server.dao.UserDAO;
 import edu.byu.cs.tweeter.server.util.FakeData;
 
 public class UserService {
+    DAOFactory factory;
+
+    public UserService() {
+        this.factory = new AWSDAOFactory();
+    }
 
     public LoginResponse login(LoginRequest request) {
-
-        // TODO: Generates dummy data. Replace with a real implementation.
-        User user = getDummyUser();
-        AuthToken authToken = getDummyAuthToken();
-        return new LoginResponse(user, authToken);
+        return GetUserDAO().login(request);
+//        User user = getDummyUser();
+//        AuthToken authToken = getDummyAuthToken();
+//        return new LoginResponse(user, authToken);
     }
 
     public RegisterResponse register(RegisterRequest request) {
-        User user = getDummyUser();
-        AuthToken authToken = getDummyAuthToken();
-        return new RegisterResponse(user, authToken);
+        return GetUserDAO().register(request);
+//        User user = getDummyUser();
+//        AuthToken authToken = getDummyAuthToken();
+//        return new RegisterResponse(user, authToken);
     }
 
     public LogoutResponse logout(LogoutRequest request) {
+//        return GetUserDAO().logout(request);
         return new LogoutResponse();
     }
 
     public GetUserResponse getUser(GetUserRequest request) {
+//        return GetUserDAO().getUser(request);
         GetUserResponse response = new GetUserResponse(getRequestedUser(request.getUserAlias()));
         return response;
     }
@@ -69,4 +78,6 @@ public class UserService {
     FakeData getFakeData() {
         return new FakeData();
     }
+
+    private UserDAO GetUserDAO() { return factory.getUserDAO(); }
 }
