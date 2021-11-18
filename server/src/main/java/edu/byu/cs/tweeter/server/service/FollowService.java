@@ -1,5 +1,9 @@
 package edu.byu.cs.tweeter.server.service;
 
+import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
+
+import java.util.List;
+
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
@@ -15,6 +19,7 @@ import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.PagedResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 import edu.byu.cs.tweeter.server.dao.FollowDAO;
+import edu.byu.cs.tweeter.server.dao.IFollowDAO;
 
 /**
  * Contains the business logic for getting the users a user is following.
@@ -35,41 +40,54 @@ public class FollowService {
      * @return the followees.
      */
     public FollowResponse followUser(FollowRequest request) {
-//        return GetFollowingDAO().followUser(request);
-        FollowResponse response = new FollowResponse();
-        return response;
+        try {
+            User currUser = factory.getUserDAO().getUser(request.getCurrUsername());
+            User userToFollow = factory.getUserDAO().getUser(request.getFollweeName());
+            factory.getFollowDAO().putFollows(currUser, userToFollow);
+            //TODO: Make sure to update counts
+            return new FollowResponse();
+        } catch (Exception e) {
+            return new FollowResponse(e.getMessage());
+        }
     }
 
     public UnfollowResponse unfollowUser(UnfollowRequest request) {
-//        return GetFollowingDAO().unfollowUser(request);
-        UnfollowResponse response = new UnfollowResponse();
-        return response;
+        try {
+            factory.getFollowDAO().deleteFollows(request.getCurrUsername(), request.getUnfollweeName());
+            //TODO: Make sure to update counts
+            return new UnfollowResponse();
+        } catch (Exception e) {
+            return new UnfollowResponse(e.getMessage());
+        }
     }
 
     public FollowingResponse getFollowees(FollowingRequest request) {
-        return GetFollowingDAO().getFollowees(request);
+        return factory.getFollowDAO().getFollowing(request.getFollowerAlias(), request.getLastFolloweeAlias(), request.getLimit());
     }
 
     public GetFollowersResponse getFollowers(GetFollowersRequest request) {
-        return GetFollowingDAO().getFollowers(request);
+        return factory.getFollowDAO().getFollowers(request.getUserAlias(), request.getLastFollowerAlias(), request.getLimit());
     }
 
     public GetFollowersCountResponse getFollowingCount(AuthToken authToken, String userName) {
 //        return GetFollowingDAO().getFollowingCount(authToken, userName);
-        GetFollowersCountResponse response = new GetFollowersCountResponse(GetFollowingDAO().getFollowingCount(authToken, userName));
-        return response;
+        //GetFollowersCountResponse response = new GetFollowersCountResponse(GetFollowingDAO().getFollowingCount(authToken, userName));
+        //return response;
+        return null;
     }
 
     public GetFolloweeCountResponse getFolloweeCount(AuthToken authToken, String userName) {
 //        return GetFollowingDAO().getFolloweeCount(authToken, userName);
-        GetFolloweeCountResponse response = new GetFolloweeCountResponse(GetFollowingDAO().getFolloweeCount(authToken, userName));
-        return response;
+//        GetFolloweeCountResponse response = new GetFolloweeCountResponse(GetFollowingDAO().getFolloweeCount(authToken, userName));
+//        return response;
+        return null;
     }
 
     public IsFollowerResponse isFollower(AuthToken authToken, User follower, User followee) {
 //        return GetFollowingDAO().getIsFollower(authToken, follower, followee);
-        IsFollowerResponse response = new IsFollowerResponse(GetFollowingDAO().getIsFollower(authToken, follower, followee));
-        return response;
+//        IsFollowerResponse response = new IsFollowerResponse(GetFollowingDAO().getIsFollower(authToken, follower, followee));
+//        return response;
+        return null;
     }
     /**
      * Returns an instance of {@link FollowDAO}. Allows mocking of the FollowDAO class
@@ -78,7 +96,7 @@ public class FollowService {
      *
      * @return the instance.
      */
-    FollowDAO GetFollowingDAO() {
+    private IFollowDAO GetFollowingDAO() {
         return factory.getFollowDAO();
     }
 }

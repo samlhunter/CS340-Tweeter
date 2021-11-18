@@ -1,17 +1,26 @@
 package edu.byu.cs.tweeter.server.service;
 
 import edu.byu.cs.tweeter.server.dao.FollowDAO;
+import edu.byu.cs.tweeter.server.dao.IAuthTokenDAO;
+import edu.byu.cs.tweeter.server.dao.IFeedDAO;
+import edu.byu.cs.tweeter.server.dao.IFollowDAO;
+import edu.byu.cs.tweeter.server.dao.IStatusDAO;
+import edu.byu.cs.tweeter.server.dao.IStoryDAO;
+import edu.byu.cs.tweeter.server.dao.IUserDAO;
 import edu.byu.cs.tweeter.server.dao.StatusDAO;
 import edu.byu.cs.tweeter.server.dao.UserDAO;
 
 public abstract class DAOFactory {
-    protected UserDAO userDAO;
-    protected FollowDAO followDAO;
-    protected StatusDAO statusDAO;
 
-    public abstract UserDAO getUserDAO();
+    public abstract IUserDAO getUserDAO();
 
-    public abstract FollowDAO getFollowDAO();
+    public abstract IFollowDAO getFollowDAO();
 
-    public abstract StatusDAO getStatusDAO();
+    public abstract IStatusDAO getStatusDAO();
+
+    public abstract IAuthTokenDAO getAuthTokenDAO();
+
+    public abstract IStoryDAO getStoryDAO();
+
+    public abstract IFeedDAO getFeedDAO();
 }

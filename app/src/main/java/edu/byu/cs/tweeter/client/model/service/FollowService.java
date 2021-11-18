@@ -34,13 +34,13 @@ public class FollowService extends Service {
         executeTask(getFollowersTask);
     }
 
-    public void followUser(AuthToken authToken, User selectedUser, FollowObserver observer) {
-        FollowTask followTask = new FollowTask(authToken, selectedUser, new FollowHandler(observer));
+    public void followUser(AuthToken authToken,String currUsername, User selectedUser, FollowObserver observer) {
+        FollowTask followTask = new FollowTask(authToken, currUsername, selectedUser, new FollowHandler(observer));
         executeTask(followTask);
     }
 
-    public void unfollowUser(AuthToken authToken, User selectedUser, UnfollowObserver observer) {
-        UnfollowTask unfollowTask = new UnfollowTask(authToken, selectedUser, new UnfollowHandler(observer));
+    public void unfollowUser(AuthToken authToken, String currUsername, User selectedUser, UnfollowObserver observer) {
+        UnfollowTask unfollowTask = new UnfollowTask(authToken, currUsername, selectedUser, new UnfollowHandler(observer));
         executeTask(unfollowTask);
     }
 

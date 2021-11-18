@@ -35,14 +35,14 @@ public class FollowServiceTest {
 
         // Setup a request object to use in the tests
         request = new FollowingRequest(authToken, currentUser.getAlias(), 3, null);
-
-        // Setup a mock FollowDAO that will return known responses
-        expectedResponse = new FollowingResponse(Arrays.asList(resultUser1, resultUser2, resultUser3), false);
-        mockFollowDAO = Mockito.mock(FollowDAO.class);
-        Mockito.when(mockFollowDAO.getFollowees(request)).thenReturn(expectedResponse);
+//
+//        // Setup a mock FollowDAO that will return known responses
+//        expectedResponse = new FollowingResponse(Arrays.asList(resultUser1, resultUser2, resultUser3), false);
+//        mockFollowDAO = Mockito.mock(FollowDAO.class);
+//        Mockito.when(mockFollowDAO.getFollowees(request)).thenReturn(expectedResponse);
 
         followServiceSpy = Mockito.spy(FollowService.class);
-        Mockito.when(followServiceSpy.getFollowingDAO()).thenReturn(mockFollowDAO);
+        //Mockito.when(followServiceSpy.getFollowingDAO()).thenReturn(mockFollowDAO);
     }
 
     /**

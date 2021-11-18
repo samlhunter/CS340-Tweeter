@@ -78,11 +78,11 @@ public class MainPresenter extends Presenter implements
         view.enableFollowButton(false);
         if (buttonText.equals("Following")) {
             view.displayInfoMessage("Removing " + selectedUser.getName() + "...");
-            new FollowService().unfollowUser(authToken, selectedUser, this);
+            new FollowService().unfollowUser(authToken, Cache.getInstance().getCurrUser().getAlias(), selectedUser, this);
         }
         else {
             view.displayInfoMessage("Adding " + selectedUser.getName() + "...");
-            new FollowService().followUser(authToken,selectedUser,this);
+            new FollowService().followUser(authToken, Cache.getInstance().getCurrUser().getAlias(), selectedUser,this);
         }
     }
 

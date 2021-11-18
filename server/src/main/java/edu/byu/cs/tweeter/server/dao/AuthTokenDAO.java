@@ -47,14 +47,14 @@ public class AuthTokenDAO implements IAuthTokenDAO{
         String strDate = dateFormat.format(date);
         // Create the object and add to table
         AuthToken authToken = new AuthToken(token, strDate);
-        try {
-            Table table = dynamoDB.getTable("authtoken");
-            PutItemOutcome outcome = table.putItem(new Item().withPrimaryKey("authToken", token)
-                                                  .with("datetime",strDate)
-            );
-        } catch (Exception e) {
-            throw new Exception("Exception caught adding authToken to table");
-        }
+//        try {
+//            Table table = dynamoDB.getTable("authtoken");
+//            PutItemOutcome outcome = table.putItem(new Item().withPrimaryKey("authToken", token)
+//                                                  .with("datetime",strDate)
+//            );
+//        } catch (Exception e) {
+//            throw new Exception("Exception caught adding authToken to table");
+//        }
         // Return the object
         return authToken;
     }

@@ -6,6 +6,7 @@ import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
 import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
+import edu.byu.cs.tweeter.server.dao.IStatusDAO;
 import edu.byu.cs.tweeter.server.dao.StatusDAO;
 
 public class StatusService {
@@ -30,7 +31,7 @@ public class StatusService {
 //        return new PostStatusResponse();
     }
 
-    private StatusDAO GetStatusDAO() {
+    private IStatusDAO GetStatusDAO() {
         return factory.getStatusDAO();
     }
 }
