@@ -21,7 +21,12 @@ public class followingPresenter extends PagedPresenter<User> implements FollowSe
 
     @Override
     public void getFollowingSucceeded(List<User> users, boolean hasMorePages) {
-        getItemsSucceeded(hasMorePages, users.get(users.size() - 1));
+        if (users.size() == 0) {
+            getItemsSucceeded(hasMorePages, null);
+        }
+        else {
+            getItemsSucceeded(hasMorePages, users.get(users.size() - 1));
+        }
         view.addItems(users);
     }
 }

@@ -31,6 +31,11 @@ public class MainActivity extends AppCompatActivity implements
         StatusDialogFragment.Observer,
         MainPresenter.MainView
 {
+    @Override
+    protected void onSaveInstanceState(Bundle oldInstanceState) {
+        super.onSaveInstanceState(oldInstanceState);
+        oldInstanceState.clear();
+    }
 
     private static final String LOG_TAG = "MainActivity";
 

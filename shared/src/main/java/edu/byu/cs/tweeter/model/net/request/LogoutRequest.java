@@ -8,4 +8,12 @@ public class LogoutRequest {
     public LogoutRequest(AuthToken authToken) {
         this.authtoken = authToken;
     }
+
+    public AuthToken getAuthtoken() {
+        return authtoken;
+    }
+
+    public void setAuthtoken(AuthToken authtoken) {
+        this.authtoken = authtoken;
+    }
 }

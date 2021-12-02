@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.Status;
+import edu.byu.cs.tweeter.model.domain.UserDTO;
 import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
 import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
 import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
@@ -78,6 +79,10 @@ public class StatusDAO implements IStatusDAO {
             }
         }
         return statusIndex;
+    }
+
+    public void updateFeedQueue(List<UserDTO> users) {
+
     }
 
     private List<Status> getDummyStatuses() {

@@ -34,7 +34,7 @@ public class GetUserTask extends AuthorizedTask {
         try {
             GetUserResponse getUserResponse = new ServerFacade().getUser(getUserRequest, "/getuser");
             if (getUserResponse.isSuccess()) {
-                this.user = getUser();
+                this.user = getUserResponse.getUser();
                 BackgroundTaskUtils.loadImage(this.user);
             }
         } catch (Exception e) {

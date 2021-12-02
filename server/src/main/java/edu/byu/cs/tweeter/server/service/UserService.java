@@ -56,7 +56,7 @@ public class UserService {
         try {
             String url = setS3ImageFile(request);
 
-            PutItemOutcome outcome = factory.getUserDAO().putUser(request.getFirstName(),
+            factory.getUserDAO().putUser(request.getFirstName(),
                     request.getLastName(), request.getUsername(), securePassword, url);
             AuthToken authToken = factory.getAuthTokenDAO().createAuthToken();
             User registeredUser = new User(request.getFirstName(), request.getLastName(), request.getUsername(), url);
@@ -69,13 +69,23 @@ public class UserService {
 
     public LogoutResponse logout(LogoutRequest request) {
         // Will need to delete authToken
+        AuthToken currAuthToken = factory.getAuthTokenDAO().getAuthToken(request.getAuthtoken());
+        factory.getAuthTokenDAO().deleteAuthToken(currAuthToken);
         return new LogoutResponse();
     }
 
     public GetUserResponse getUser(GetUserRequest request) {
         assert request.getUserAlias() != null;
         try {
-            return new GetUserResponse(factory.getUserDAO().getUser(request.getUserAlias()));
+            boolean authenticated = authenticate(factory.getAuthTokenDAO().getAuthToken(request.getAuthToken()));
+            if (authenticated) {
+                System.out.println("Getting user: " + request.getUserAlias());
+                User user = factory.getUserDAO().getUser(request.getUserAlias());
+                return new GetUserResponse(user);
+            }
+            else {
+                return new GetUserResponse("Session expired, login again");
+            }
         } catch (Exception e) {
             return new GetUserResponse(e.getMessage());
         }
@@ -119,5 +129,19 @@ public class UserService {
     private boolean validatePasswords(String givenPassword, String storedPassword, String username) {
         String givenHashed = getHashedPassword(givenPassword, username);
         return givenHashed.equals(storedPassword);
+    }
+
+    private boolean authenticate(AuthToken authToken) {
+        try {
+            AuthToken token = this.factory.getAuthTokenDAO().validateAuthToken(authToken);
+            if (token == null) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        } catch(Exception e) {
+            return false;
+        }
     }
 }

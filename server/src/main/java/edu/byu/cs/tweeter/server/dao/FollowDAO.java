@@ -2,6 +2,7 @@ package edu.byu.cs.tweeter.server.dao;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.BatchWriteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -9,10 +10,13 @@ import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.TableWriteItems;
+import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryResult;
+import com.amazonaws.services.dynamodbv2.model.WriteRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +27,7 @@ import java.util.Random;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.domain.UserDTO;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
@@ -117,6 +122,35 @@ public class FollowDAO implements IFollowDAO{
      */
     FakeData getFakeData() {
         return new FakeData();
+    }
+
+    public List<UserDTO> getAuthorFollowing(String authorAlias) {
+        List<UserDTO> followees = new ArrayList<>();
+
+        Map<String, String> attNames = new HashMap<String, String>();
+        attNames.put("#handle", "followee_handle");
+
+        Map<String, AttributeValue> attValues = new HashMap<>();
+        attValues.put(":username", new AttributeValue().withS(authorAlias));
+
+        QueryRequest queryRequest = new QueryRequest()
+                .withTableName("follows")
+                .withIndexName("follows_index")
+                .withKeyConditionExpression("#handle = :username")
+                .withExpressionAttributeNames(attNames)
+                .withExpressionAttributeValues(attValues);
+
+        QueryResult queryResult = client.query(queryRequest);
+        List<Map<String, AttributeValue>> items = queryResult.getItems();
+
+        if (items != null) {
+            for (Map<String, AttributeValue> item : items){
+                UserDTO user = new UserDTO();
+                user.setAlias(item.get("follower_handle").getS());
+                followees.add(user);
+            }
+        }
+        return followees;
     }
 
     @Override
@@ -240,8 +274,20 @@ public class FollowDAO implements IFollowDAO{
     }
 
     @Override
-    public boolean isFollower(String currUser, String userToUnfollow) {
-        return false;
+    public boolean getFollows(String currUser, String followee) {
+        GetItemSpec spec = new GetItemSpec().withPrimaryKey("follower_handle", currUser, "followee_handle", followee);
+        try {
+            Item outcome = table.getItem(spec);
+            if(outcome != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 
     @Override
@@ -251,7 +297,7 @@ public class FollowDAO implements IFollowDAO{
         PutItemOutcome outcome = table.putItem(new Item().withPrimaryKey("follower_handle", currUser.getAlias(), "followee_handle", toFollow.getAlias())
                      .withString("followerFirstName", currUser.getFirstName())
                      .withString("followerLastName", currUser.getLastName())
-                     .withString("foloweeFirstName", toFollow.getFirstName())
+                     .withString("followeeFirstName", toFollow.getFirstName())
                      .withString("followeeLastName", toFollow.getLastName())
                      .withString("followerURL", currUser.getImageUrl())
                      .withString("followeeURL", toFollow.getImageUrl())
@@ -261,5 +307,46 @@ public class FollowDAO implements IFollowDAO{
     @Override
     public void deleteFollows(String currUser, String toUnfollow) {
         DeleteItemOutcome outcome = table.deleteItem("follower_handle", currUser, "followee_handle", toUnfollow);
+    }
+
+    @Override
+    public void addFollowersBatch(List<String> users, String followTarget) {
+        // Constructor for TableWriteItems takes the name of the table, which I have stored in TABLE_USER
+        TableWriteItems items = new TableWriteItems("follows");
+
+        // Add each user into the TableWriteItems object
+        for (String user : users) {
+            Item item = new Item()
+                    .withPrimaryKey("follower_handle", user, "followee_handle", followTarget)
+                    .withString("name", user);
+            items.addItemToPut(item);
+
+            // 25 is the maximum number of items allowed in a single batch write.
+            // Attempting to write more than 25 items will result in an exception being thrown
+            if (items.getItemsToPut() != null && items.getItemsToPut().size() == 25) {
+                loopBatchWrite(items);
+                items = new TableWriteItems("follows");
+            }
+        }
+
+        // Write any leftover items
+        if (items.getItemsToPut() != null && items.getItemsToPut().size() > 0) {
+            loopBatchWrite(items);
+        }
+    }
+
+    private void loopBatchWrite(TableWriteItems items) {
+
+        // The 'dynamoDB' object is of type DynamoDB and is declared statically in this example
+        BatchWriteItemOutcome outcome = dynamoDB.batchWriteItem(items);
+        System.out.println("Wrote Followers Batch");
+
+        // Check the outcome for items that didn't make it onto the table
+        // If any were not added to the table, try again to write the batch
+        while (outcome.getUnprocessedItems().size() > 0) {
+            Map<String, List<WriteRequest>> unprocessedItems = outcome.getUnprocessedItems();
+            outcome = dynamoDB.batchWriteItemUnprocessed(unprocessedItems);
+            System.out.println("Wrote more Followers");
+        }
     }
 }

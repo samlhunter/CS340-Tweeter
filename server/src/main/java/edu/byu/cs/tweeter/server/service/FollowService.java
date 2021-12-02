@@ -41,62 +41,107 @@ public class FollowService {
      */
     public FollowResponse followUser(FollowRequest request) {
         try {
-            User currUser = factory.getUserDAO().getUser(request.getCurrUsername());
-            User userToFollow = factory.getUserDAO().getUser(request.getFollweeName());
-            factory.getFollowDAO().putFollows(currUser, userToFollow);
-            //TODO: Make sure to update counts
-            return new FollowResponse();
+            if(authenticate(request.getAuthToken())) {
+                User currUser = factory.getUserDAO().getUser(request.getCurrUsername());
+                User userToFollow = factory.getUserDAO().getUser(request.getFollweeName());
+                factory.getFollowDAO().putFollows(currUser, userToFollow);
+                factory.getUserDAO().incrementFollowerCount(request.getFollweeName());
+                factory.getUserDAO().incrementFollowingCount(request.getCurrUsername());
+                return new FollowResponse();
+            }
+            else {
+                return new FollowResponse("Session expired, login again");
+            }
         } catch (Exception e) {
             return new FollowResponse(e.getMessage());
         }
     }
 
     public UnfollowResponse unfollowUser(UnfollowRequest request) {
-        try {
-            factory.getFollowDAO().deleteFollows(request.getCurrUsername(), request.getUnfollweeName());
-            //TODO: Make sure to update counts
-            return new UnfollowResponse();
-        } catch (Exception e) {
-            return new UnfollowResponse(e.getMessage());
+        boolean authenticated = authenticate(factory.getAuthTokenDAO().getAuthToken(request.getAuthToken()));
+        if (authenticated) {
+            try {
+                factory.getFollowDAO().deleteFollows(request.getCurrUsername(), request.getUnfollweeName());
+                factory.getUserDAO().decrementFollowingCount(request.getCurrUsername());
+                factory.getUserDAO().decrementFollowerCount(request.getUnfollweeName());
+                return new UnfollowResponse();
+            } catch (Exception e) {
+                return new UnfollowResponse(e.getMessage());
+            }
+        }
+        else {
+            return new UnfollowResponse("Session expired! Login again");
         }
     }
 
     public FollowingResponse getFollowees(FollowingRequest request) {
-        return factory.getFollowDAO().getFollowing(request.getFollowerAlias(), request.getLastFolloweeAlias(), request.getLimit());
+        boolean authenticated = authenticate(factory.getAuthTokenDAO().getAuthToken(request.getAuthToken()));
+        if (authenticated) {
+            return factory.getFollowDAO().getFollowing(request.getFollowerAlias(), request.getLastFolloweeAlias(), request.getLimit());
+        }
+        else {
+            return new FollowingResponse("Session expired! Login again");
+        }
     }
 
     public GetFollowersResponse getFollowers(GetFollowersRequest request) {
-        return factory.getFollowDAO().getFollowers(request.getUserAlias(), request.getLastFollowerAlias(), request.getLimit());
+        boolean authenticated = authenticate(factory.getAuthTokenDAO().getAuthToken(request.getAuthToken()));
+        if (authenticated) {
+            return factory.getFollowDAO().getFollowers(request.getUserAlias(), request.getLastFollowerAlias(), request.getLimit());
+        }
+        else {
+            return new GetFollowersResponse("Session expired! Login again");
+        }
     }
 
-    public GetFollowersCountResponse getFollowingCount(AuthToken authToken, String userName) {
-//        return GetFollowingDAO().getFollowingCount(authToken, userName);
-        //GetFollowersCountResponse response = new GetFollowersCountResponse(GetFollowingDAO().getFollowingCount(authToken, userName));
-        //return response;
-        return null;
+    public GetFollowersCountResponse getFollowingCount(AuthToken authToken, String username) {
+        boolean authenticated = authenticate(factory.getAuthTokenDAO().getAuthToken(authToken));
+        if (authenticated) {
+            return new GetFollowersCountResponse(factory.getUserDAO().getFollowerCount(username));
+        }
+        else {
+            return new GetFollowersCountResponse("Session expired! Login again");
+        }
     }
 
-    public GetFolloweeCountResponse getFolloweeCount(AuthToken authToken, String userName) {
-//        return GetFollowingDAO().getFolloweeCount(authToken, userName);
-//        GetFolloweeCountResponse response = new GetFolloweeCountResponse(GetFollowingDAO().getFolloweeCount(authToken, userName));
-//        return response;
-        return null;
+    public GetFolloweeCountResponse getFolloweeCount(AuthToken authToken, String username) {
+        boolean authenticated = authenticate(factory.getAuthTokenDAO().getAuthToken(authToken));
+        if (authenticated) {
+            return new GetFolloweeCountResponse(factory.getUserDAO().getFollowingCount(username));
+        }
+        else {
+            return new GetFolloweeCountResponse("Session expired! Login again");
+        }
     }
 
     public IsFollowerResponse isFollower(AuthToken authToken, User follower, User followee) {
-//        return GetFollowingDAO().getIsFollower(authToken, follower, followee);
-//        IsFollowerResponse response = new IsFollowerResponse(GetFollowingDAO().getIsFollower(authToken, follower, followee));
-//        return response;
-        return null;
+        boolean authenticated = authenticate(factory.getAuthTokenDAO().getAuthToken(authToken));
+        if (authenticated) {
+            System.out.println("Successfully authenticated, checking is follower");
+            assert follower.getAlias() != null;
+            assert followee.getAlias() != null;
+            boolean isFollower = false;
+
+            isFollower = factory.getFollowDAO().getFollows(follower.getAlias(),
+                    followee.getAlias());
+            if (isFollower) {
+                System.out.println("Got a successful response");
+                return new IsFollowerResponse(true);
+            } else {
+                return new IsFollowerResponse("Not a follower");
+            }
+        }
+        else {
+            return new IsFollowerResponse("Session expired");
+        }
     }
-    /**
-     * Returns an instance of {@link FollowDAO}. Allows mocking of the FollowDAO class
-     * for testing purposes. All usages of FollowDAO should get their FollowDAO
-     * instance from this method to allow for mocking of the instance.
-     *
-     * @return the instance.
-     */
-    private IFollowDAO GetFollowingDAO() {
-        return factory.getFollowDAO();
+
+    private boolean authenticate(AuthToken authToken) {
+        try {
+            this.factory.getAuthTokenDAO().validateAuthToken(authToken);
+            return true;
+        } catch(Exception e) {
+            return false;
+        }
     }
 }
