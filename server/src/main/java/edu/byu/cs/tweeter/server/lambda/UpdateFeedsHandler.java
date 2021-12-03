@@ -11,6 +11,8 @@ import java.util.List;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.UserDTO;
 import edu.byu.cs.tweeter.model.net.UpdateFeedQueueMessage;
+import edu.byu.cs.tweeter.server.dao.FeedDAO;
+import edu.byu.cs.tweeter.server.dao.FollowDAO;
 import edu.byu.cs.tweeter.server.util.JsonSerializer;
 
 public class UpdateFeedsHandler implements RequestHandler<SQSEvent, Void> {
@@ -22,7 +24,7 @@ public class UpdateFeedsHandler implements RequestHandler<SQSEvent, Void> {
             Status status = toHandle.status;
 
             //Now we need to batch write to the feed table
-
+            new FeedDAO().putFeed(status, followers);
         }
         return null;
     }

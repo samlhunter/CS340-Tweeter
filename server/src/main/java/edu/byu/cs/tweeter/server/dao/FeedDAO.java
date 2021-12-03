@@ -131,19 +131,20 @@ public class FeedDAO implements IFeedDAO{
             }
 
         }
+        System.out.println("Feed table updated for all users");
     }
 
     private void loopBatchWrite(TableWriteItems items) {
         // The 'dynamoDB' object is of type DynamoDB and is declared statically in this example
         BatchWriteItemOutcome outcome = dynamoDB.batchWriteItem(items);
-        System.out.println("Wrote User Batch");
+        //System.out.println("Wrote User Batch");
 
         // Check the outcome for items that didn't make it onto the table
         // If any were not added to the table, try again to write the batch
         while (outcome.getUnprocessedItems().size() > 0) {
             Map<String, List<WriteRequest>> unprocessedItems = outcome.getUnprocessedItems();
             outcome = dynamoDB.batchWriteItemUnprocessed(unprocessedItems);
-            System.out.println("Wrote more Users");
+            //System.out.println("Wrote more Users");
         }
     }
 }
